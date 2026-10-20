@@ -1,0 +1,815 @@
+/* AppUpload (from the AppUpload app, appupload main): styles.css + mobile.css,
+   scoped to .au-root (ids carry an au- prefix) */
+.au-root {
+  --bg: #ffffff;
+  --bg-grad-1: #ffffff;
+  --bg-grad-2: #ffffff;
+  --card: rgba(255, 255, 255, 0.3); /* barely-there glass over the video */
+  --ink: #14274e; /* navy — default body/lettering color */
+  --ink-soft: #3a4d7a; /* muted navy — secondary text */
+  --line: rgba(255, 255, 255, 0.35);
+  --accent: #1e3f8f; /* navy blue — buttons, links, accents */
+  --accent-dark: #15296b; /* deeper navy — hovers, emphasis text */
+  --accent-soft: #e8eef9; /* light blue tint — soft fills, focus rings */
+  --danger: #b4452f;
+  --warn-bg: #fdf3d8;
+  --warn-ink: #6b5414;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(40, 45, 55, 0.08);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.au-root * { box-sizing: border-box; }
+
+.au-root {
+  margin: 0;
+  color: var(--ink);
+  /* Static fallback behind the video backdrop; also shows while the video loads. */
+  background: #05080b url("../../backdrop.png") center / cover no-repeat fixed;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Rotating video backdrop — pinned behind everything; cards stay solid white on top.
+   Two stacked players alternate through the playlist; opacity crossfades the hand-off
+   (the finished video holds its last frame underneath while the next one fades in). */
+.au-root .bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  /* fill: the whole shot stays visible AND spans the full window edge-to-edge
+     (the frame stretches to the window's shape rather than cropping or boxing) */
+  object-fit: fill;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+.au-root .bg-video-hidden { opacity: 0; }
+/* Ultra-wide (21:9 / 32:9) and portrait screens: stretching a ~16:9 clip that far
+   visibly distorts it — crop to fill instead (cover keeps proportions true).
+   Normal landscape monitors keep the original whole-shot fill look. */
+@media (min-aspect-ratio: 2/1), (max-aspect-ratio: 1/1) {
+  .au-root .bg-video { object-fit: cover; }
+}
+/* Soft dark scrim so the logo chip and light labels stay readable over bright frames. */
+.au-root .bg-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 10, 0.28);
+  z-index: -1;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .au-root .bg-video { display: none; }
+}
+
+.au-root .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.au-root main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 6px 20px 40px;
+}
+
+.au-root .card {
+  background: var(--card);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  /* soft white halo keeps the navy text readable when a dark video frame
+     shows through the low-opacity glass */
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: none;
+  padding: 24px;
+  margin-bottom: 22px;
+}
+
+.au-root .step-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  margin: 0 0 16px;
+}
+.au-root .step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Dropzone */
+.au-root .dropzone {
+  border: 2px dashed #cdc4b1;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 34px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+}
+.au-root .dropzone:hover { border-color: var(--accent); background: rgba(232, 238, 249, 0.55); }
+.au-root .dropzone:focus-visible { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
+.au-root .dropzone.dragover { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.005); }
+.au-root .dropzone-primary { font-weight: 600; margin: 8px 0 2px; }
+.au-root .dropzone-secondary { margin: 0; color: var(--ink-soft); }
+.au-root .link-btn {
+  background: none; border: none; padding: 0;
+  color: var(--accent); font: inherit; font-weight: 600;
+  cursor: pointer; text-decoration: underline;
+}
+
+/* Thumbnails */
+.au-root .thumb-list {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+.au-root .thumb {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(246, 247, 249, 0.3);
+  aspect-ratio: 3 / 4;
+}
+.au-root .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.au-root .thumb .page-badge {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(31, 36, 48, 0.78); color: #fff;
+  font-size: 0.72rem; padding: 2px 7px; border-radius: 20px;
+}
+.au-root .thumb .remove-thumb {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: rgba(31, 36, 48, 0.78); color: #fff;
+  font-size: 0.95rem; line-height: 1; display: grid; place-items: center;
+}
+.au-root .thumb .remove-thumb:hover { background: var(--danger); }
+.au-root .pdf-tile {
+  width: 100%; height: 100%; padding: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: rgba(243, 244, 247, 0.3); text-align: center;
+}
+.au-root .pdf-ico {
+  font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em;
+  color: var(--danger); border: 2px solid var(--danger); border-radius: 6px; padding: 2px 8px;
+}
+.au-root .pdf-name { font-size: 0.7rem; color: var(--ink-soft); line-height: 1.2; overflow-wrap: anywhere; max-height: 2.4em; overflow: hidden; }
+
+/* Buttons */
+.au-root .actions { display: flex; gap: 10px; margin-top: 20px; align-items: center; }
+.au-root .actions.wrap { flex-wrap: wrap; }
+.au-root .btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.05s, opacity 0.15s;
+}
+.au-root .btn:active { transform: translateY(1px); }
+.au-root .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.au-root .btn-primary { background: var(--accent); color: #fff; }
+.au-root .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+.au-root .btn-ghost { background: transparent; color: var(--ink-soft); }
+.au-root .btn-ghost:hover:not(:disabled) { color: var(--ink); }
+
+/* Processing */
+.au-root .processing-msg { text-align: center; color: var(--ink-soft); margin: 14px 0 0; }
+.au-root .spinner {
+  width: 42px; height: 42px; margin: 6px auto 0;
+  border: 4px solid var(--accent-soft);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: au-spin 0.9s linear infinite;
+}
+@keyframes au-spin { to { transform: rotate(360deg); } }
+
+/* Result */
+.au-root .result-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.au-root .result-head .step-title { margin-bottom: 0; }
+
+
+.au-root .document {
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px 30px;
+  min-height: 200px;
+}
+.au-root .preview.document h1 { font-size: 1.5rem; margin: 0.2em 0 0.4em; }
+.au-root .preview.document h2 { font-size: 1.2rem; margin: 1em 0 0.4em; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.au-root .preview.document h3 { font-size: 1.05rem; margin: 0.9em 0 0.3em; }
+.au-root .preview.document p { margin: 0.5em 0; }
+.au-root .preview.document ul,.au-root  .preview.document ol { margin: 0.5em 0; padding-left: 1.4em; }
+.au-root .preview.document li { margin: 0.2em 0; }
+.au-root .preview.document hr { border: none; border-top: 1px solid var(--line); margin: 1.4em 0; }
+.au-root .preview.document table { border-collapse: collapse; margin: 0.6em 0; width: 100%; }
+.au-root .preview.document th,.au-root  .preview.document td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+.au-root .preview.document .unsure { background: #fdeede; border-radius: 4px; padding: 0 3px; }
+
+
+
+/* Banner */
+.au-root .banner {
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-size: 0.92rem;
+}
+.au-root .banner.warn { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid #ecd9a0; }
+.au-root .banner.error { background: #fbe6e0; color: var(--danger); border: 1px solid #f0c4b8; }
+.au-root .banner.info { background: var(--accent-soft); color: var(--accent-dark); border: 1px solid #cfe2db; }
+
+
+.au-root .hidden { display: none !important; }
+.au-root .muted { color: var(--ink-soft); }
+.au-root .small { font-size: 0.88rem; }
+
+/* Mode tabs */
+.au-root .mode-tabs {
+  max-width: 820px;
+  margin: 12px auto 0;
+  padding: 0 20px;
+  display: flex;
+  gap: 8px;
+}
+.au-root .mode-tab {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: none;
+  background: rgba(16, 24, 32, 0.72);
+  color: #cfe2ee;
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 12px 12px 0 0;
+  cursor: pointer;
+}
+.au-root .mode-tab.active { background: var(--card); color: var(--accent-dark); box-shadow: 0 -2px 8px rgba(0,0,0,0.04); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); }
+
+/* Upload-screen header (title + manual form picker) */
+.au-root .upload-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.au-root .upload-head .step-title { margin: 0; }
+
+/* Always-visible sales rep bar */
+.au-root .rep-bar { max-width: 820px; margin: 6px auto 0; padding: 0 0 4px; }
+.au-root .rep-bar label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: #cfe2ee; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.au-root .rep-bar input,.au-root  .rep-bar select {
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px;
+  font: inherit; font-size: 0.95rem; color: var(--ink); background: rgba(255, 255, 255, 0.4); min-width: 260px;
+}
+.au-root .rep-bar select { min-width: 220px; }
+.au-root .rep-bar input:focus,.au-root  .rep-bar select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+
+/* Submission history */
+.au-root .history { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 16px; }
+.au-root .history-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.au-root .history-head h3 { margin: 0; font-size: 1rem; }
+.au-root .history-note { margin: 4px 0 10px; }
+.au-root .history-search {
+  width: 100%; box-sizing: border-box; margin: 0 0 12px;
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  font: inherit; font-size: 0.95rem; background: rgba(255, 255, 255, 0.28);
+}
+.au-root .history-search:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.au-root .history-actions { display: flex; gap: 14px; }
+.au-root .history-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.au-root .history-filters .history-search { flex: 1 1 220px; margin: 0; }
+.au-root .rep-filter {
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px;
+  font: inherit; font-size: 0.9rem; background: rgba(255, 255, 255, 0.28);
+}
+.au-root .history-empty { color: var(--ink-soft); font-size: 0.9rem; padding: 8px 2px; list-style: none; }
+.au-root .history-exp,.au-root  .history-del {
+  flex: none; width: 28px; height: 28px; padding: 0;
+  display: grid; place-items: center;
+  border: none; border-radius: 50%; background: transparent;
+  color: var(--ink-soft); cursor: pointer; line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+.au-root .history-exp { font-size: 0.9rem; }
+.au-root .history-exp:hover { background: var(--accent-soft); color: var(--accent-dark); }
+.au-root .history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.au-root .history-item { display: flex; align-items: center; gap: 6px; }
+.au-root .history-open {
+  flex: 1; text-align: left; cursor: pointer; font: inherit;
+  background: rgba(255, 255, 255, 0.28); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 10px; padding: 10px 14px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.au-root .history-open:hover { background: var(--accent-soft); border-color: var(--accent); }
+.au-root .history-open strong { color: var(--accent-dark); font-size: 0.95rem; }
+.au-root .history-meta { color: var(--ink-soft); font-size: 0.8rem; }
+.au-root .history-del { font-size: 1.05rem; }
+.au-root .history-del:hover { background: #fbe6e0; color: var(--danger); }
+
+/* Review header right column */
+.au-root .head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.au-root .jump-form { display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem; font-weight: 600; color: var(--ink-soft); align-items: flex-end; }
+.au-root .jump-form select {
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+  font-size: 0.9rem; color: var(--ink); background: rgba(255, 255, 255, 0.4); font-family: inherit; min-width: 220px;
+}
+.au-root .price-hint { font-size: 0.74rem; color: var(--accent-dark); margin-top: 3px; font-weight: 600; }
+
+/* Detected badge */
+.au-root .detect-badge { font-size: 0.85rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+.au-root .detect-badge.citizens { background: var(--accent-soft); color: var(--accent-dark); }
+.au-root .detect-badge.merrick { background: #e9ecf7; color: #2f3e7a; }
+.au-root .detect-badge.greenlight { background: #e7f5e1; color: #2d6a1f; }
+.au-root .detect-badge.pathward,.au-root .detect-badge.pathward_guide { background: #e3f6f9; color: #0b5d6b; }
+.au-root .detect-badge.unknown { background: var(--warn-bg); color: var(--warn-ink); }
+
+/* Review form */
+.au-root .section-off { display: none !important; } /* hidden when a form doesn't use this section */
+.au-root .field-hidden { display: none !important; } /* field hidden when the chosen form doesn't use it */
+.au-root .review-section { border: 1px solid var(--line); border-radius: 10px; margin: 14px 0; overflow: hidden; }
+.au-root .review-section > summary {
+  cursor: pointer; padding: 12px 16px; font-weight: 700; background: rgba(243, 245, 248, 0.3);
+  list-style: none; display: flex; align-items: center; justify-content: space-between;
+}
+.au-root .review-section > summary::-webkit-details-marker { display: none; }
+.au-root .review-section > summary::after { content: "▾"; color: var(--ink-soft); }
+.au-root .review-section[open] > summary::after { content: "▴"; }
+.au-root .section-body { padding: 14px 16px; }
+
+.au-root .field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.au-root .field { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--ink-soft); }
+.au-root .field-wide { grid-column: 1 / -1; } /* equipment model dropdown spans the full row */
+/* Equipment picker: a custom text field stacked above the matrix dropdown. */
+.au-root .equip-field { gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.25); }
+.au-root .equip-sub { display: flex; flex-direction: column; gap: 4px; }
+.au-root .equip-sub > span { font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); }
+.au-root .field > span { font-weight: 600; }
+.au-root .field input,.au-root  .field select {
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  font-size: 0.95rem; color: var(--ink); background: rgba(255, 255, 255, 0.35); font-family: inherit;
+}
+.au-root .field input:focus,.au-root  .field select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+/* Empty fields are not pre-highlighted; the focus outline above is the only highlight. */
+.au-root .field.mirrored input { background: rgba(230, 233, 238, 0.3); color: var(--ink-soft); }
+/* a field that fills in by itself shows its value greyed until something is typed */
+.au-root .field.has-default input::placeholder { color: var(--ink-soft); opacity: 0.85; font-style: italic; }
+.au-root .section-note { margin: 0 0 12px; font-size: 0.85rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.au-root .checkfield { flex-direction: row; align-items: center; gap: 8px; font-size: 0.92rem; color: var(--ink); }
+.au-root .checkfield input { width: 16px; height: 16px; }
+
+/* ---- Sign Now bar (sits at the end of the form, before doc selection) ---- */
+.au-root .sign-bar { margin-top: 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.au-root .btn-sign { background: rgba(255, 255, 255, 0.4); color: var(--accent); border: 1.5px solid var(--accent); font-weight: 700; }
+.au-root .btn-sign:hover { background: var(--accent); color: #ffffff; }
+.au-root .sign-status { font-weight: 700; font-size: 0.9rem; color: var(--ink-soft); }
+.au-root .sign-status.signed { color: #1c7c3a; }
+
+/* ---- Sign Now modal ---- */
+.au-root .sign-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 20, 50, 0.55); padding: 16px; }
+.au-root .sign-modal.hidden { display: none; }
+.au-root .sign-card { background: #fff; border-radius: 14px; padding: 20px; width: 100%; max-width: 680px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.au-root .sign-modal-title { margin: 0 0 4px; color: var(--ink); font-size: 1.15rem; }
+.au-root .sign-modal-help { margin: 0 0 14px; color: var(--ink-soft); font-size: 0.88rem; }
+.au-root .sign-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.au-root .sign-tab { flex: 1; padding: 9px; border: 1px solid var(--line); background: #fafbfc; border-radius: 8px;
+  font-weight: 700; color: var(--ink-soft); cursor: pointer; font-family: inherit; font-size: 0.9rem; }
+.au-root .sign-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.au-root .sign-pad { width: 100%; height: 220px; border: 2px dashed var(--line); border-radius: 10px;
+  background: #fff; touch-action: none; cursor: crosshair; display: block; }
+.au-root .sign-type-input { width: 100%; box-sizing: border-box; padding: 12px; font-size: 1rem;
+  border: 1px solid var(--line); border-radius: 8px; }
+.au-root .sign-type-preview { margin-top: 10px; min-height: 90px; display: flex; align-items: center; padding: 8px 12px;
+  border: 2px dashed var(--line); border-radius: 10px; color: var(--accent); overflow: hidden;
+  font-family: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive; font-size: 2.6rem; }
+.au-root .sign-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+.au-root .generate-actions { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 18px; }
+.au-root .dl-title { font-weight: 700; color: var(--ink); margin: 0 0 10px; font-size: 0.95rem; }
+.au-root .dl-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.au-root .dl-check {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  font-size: 0.95rem; color: var(--ink); font-weight: 600;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.28);
+}
+.au-root .dl-check:hover { border-color: var(--accent); background: var(--accent-soft); }
+.au-root .dl-check input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+
+/* Menu table */
+.au-root .table-wrap { overflow-x: auto; margin: 12px 0; }
+.au-root .menu-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.au-root .menu-table th,.au-root  .menu-table td { border: 1px solid var(--line); padding: 4px; text-align: left; }
+.au-root .menu-table th { background: rgba(246, 247, 249, 0.3); font-size: 0.8rem; }
+.au-root .menu-table input { width: 100%; border: none; padding: 6px; font: inherit; background: transparent; }
+.au-root .menu-table input:focus { outline: 2px solid var(--accent-soft); border-radius: 4px; }
+.au-root .menu-table td.price-col { width: 90px; }
+.au-root .menu-table td.cat-col { width: 150px; }
+.au-root .row-del { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem; padding: 0 6px; }
+
+@media (max-width: 560px) {
+  .au-root .card { padding: 18px; }
+  .au-root .actions { flex-wrap: wrap; }
+  .au-root .document { padding: 20px 18px; }
+}
+
+/* On wide screens, dock the content column to the right so the helmet in the
+   video backdrop stays in view, and shrink the whole panel (every field kept,
+   just rendered smaller). Tune --panel-zoom to taste: 0.5 = exact half size.
+   Narrow screens keep the centered, full-size column. */
+.au-root { --panel-zoom: 0.6; }
+@media (min-width: 1100px) {
+  .au-root .mode-tabs,.au-root 
+  .rep-bar,.au-root 
+  main {
+    margin-left: auto;
+    margin-right: 5vw;
+    zoom: var(--panel-zoom);
+  }
+}
+
+
+/* "+N older" hint under the trimmed history list */
+.au-root .history-more { list-style: none; padding: 8px 4px 2px; color: var(--ink-soft); font-size: 0.85rem; font-style: italic; }
+
+
+/* ==== mobile.css ==== */
+/* ==========================================================================
+   mobile.css — iOS / small-screen enhancements.
+   Everything is scoped under @media (max-width: 768px), so on desktop
+   (>=769px) NONE of these rules apply and the existing build is untouched.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Stop iOS from inflating text; keep momentum scrolling and tame tap flash. */
+  .au-root { -webkit-text-size-adjust: 100%; }
+  .au-root * { -webkit-tap-highlight-color: rgba(47, 93, 143, 0.12); }
+
+  .au-root {
+    /* Grayscale antialiasing — WebKit's default subpixel smoothing makes SF Pro
+       render heavy/thick on iOS; this renders the lettering crisp and light. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;            /* base for iOS < 15.4 (no svh/dvh support) */
+    min-height: 100svh;           /* small viewport unit — avoids iOS toolbar jump */
+    min-height: 100dvh;           /* dynamic viewport where supported */
+    /* clear the notch in landscape; insets are 0 in portrait */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* iOS Safari zooms the page when focusing an input whose font-size < 16px.
+     Force every control to 16px so focusing a field never zooms. */
+  .au-root input,.au-root  select,.au-root  textarea { font-size: 16px !important; }
+
+  /* ---- Header ---- */
+
+  /* ---- Layout shell ---- */
+  .au-root main { padding: 6px 14px calc(env(safe-area-inset-bottom) + 28px); }
+  .au-root .card { padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .au-root .step-title { font-size: 1.05rem; }
+
+  /* ---- Mode tabs: equal-width, no horizontal scroll ---- */
+  .au-root .mode-tabs { padding: 0 14px; gap: 6px; }
+  .au-root .mode-tab { flex: 1 1 0; text-align: center; padding: 11px 8px; font-size: 0.9rem; }
+
+  /* ---- Sales rep bar: stack label over a full-width control ---- */
+  .au-root .rep-bar { padding: 0 0 6px; }
+  .au-root .rep-bar label { display: flex; flex-direction: column; align-items: stretch; width: 100%; gap: 5px; }
+  .au-root .rep-bar input,.au-root  .rep-bar select { min-width: 0; width: 100%; box-sizing: border-box; }
+
+  /* ---- Upload header: stack title + manual form picker ---- */
+  .au-root .upload-head { flex-direction: column; align-items: stretch; gap: 10px; }
+  .au-root .jump-form { align-items: stretch; }
+  .au-root .jump-form select { min-width: 0; width: 100%; box-sizing: border-box; padding: 12px; min-height: 44px; }
+
+  /* ---- Dropzone ---- */
+  .au-root .dropzone { padding: 26px 14px; }
+
+  /* ---- Thumbnails ---- */
+  .au-root .thumb-list { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; }
+
+  /* ---- Buttons: comfortable tap targets ---- */
+  .au-root .btn { padding: 12px 16px; min-height: 46px; }
+  .au-root .actions { flex-wrap: wrap; }
+  .au-root .actions .btn { flex: 1 1 auto; }
+
+  /* ---- Review header: stack detect badge + jump-to-form ---- */
+  .au-root .result-head { flex-direction: column; align-items: stretch; gap: 10px; }
+  .au-root .head-right { align-items: stretch; }
+  .au-root .detect-badge { display: inline-block; white-space: normal; }
+
+  /* ---- Review form: one field per row ---- */
+  .au-root .field-row { grid-template-columns: 1fr; gap: 12px; }
+  .au-root .field input,.au-root  .field select { padding: 12px; min-height: 44px; }
+  .au-root .section-body { padding: 14px 14px; }
+
+  /* ---- Generate / download buttons: full-width stack ---- */
+  .au-root .generate-actions { flex-direction: column; align-items: stretch; }
+  .au-root .generate-actions .btn { width: 100%; }
+
+  /* ---- History ---- */
+  .au-root .history-head { flex-wrap: wrap; gap: 8px; }
+  .au-root .history-filters { flex-direction: column; align-items: stretch; }
+  /* reset the base `flex: 1 1 220px` so the search box doesn't grow tall in a column */
+  .au-root .history-filters .history-search,.au-root  .rep-filter { flex: 0 0 auto; width: 100%; box-sizing: border-box; }
+  .au-root .history-open strong,.au-root  .history-meta { overflow-wrap: anywhere; }
+  /* 44px hit area + more gap so export/delete aren't mis-tapped (glyph size unchanged) */
+  .au-root .history-item { gap: 10px; }
+  .au-root .history-exp,.au-root  .history-del { width: 44px; height: 44px; }
+
+  /* ---- Menu → Clover table: scroll horizontally with momentum ---- */
+  .au-root .table-wrap { -webkit-overflow-scrolling: touch; }
+  .au-root .menu-table { min-width: 620px; }
+  .au-root .menu-table th:nth-child(4),.au-root  .menu-table td:nth-child(4) { min-width: 180px; } /* Description gets room */
+  .au-root .menu-table th:last-child,.au-root  .menu-table td:last-child { width: 46px; }          /* delete column */
+  .au-root .row-del { min-width: 44px; min-height: 44px; padding: 0 10px; }               /* tappable delete */
+}
+
+/* Extra-small phones (iPhone SE / mini) */
+@media (max-width: 380px) {
+  .au-root .card { padding: 14px; }
+  .au-root .mode-tab { font-size: 0.84rem; padding: 10px 5px; }
+  .au-root main { padding-left: 12px; padding-right: 12px; }
+}
+
+/* Large phones in landscape are wider than 768px, so the main block drops out.
+   Keep the two iOS-critical fixes (no input-zoom, notch insets) on touch devices.
+   `pointer: coarse` means a real touch screen, so a narrowed desktop window is never affected. */
+@media (max-width: 932px) and (orientation: landscape) and (pointer: coarse) {
+  .au-root input,.au-root  select,.au-root  textarea { font-size: 16px !important; }
+  .au-root {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* The fixed full-page backdrop stutters on mobile Safari/Chrome; scroll it instead. */
+@media (max-width: 700px) {
+  .au-root { background-attachment: scroll; }
+}
+
+
+/* ============================================================
+   Ice Kannon Route integration (everything above is AppUpload's own
+   styles.css + mobile.css, scoped to .au-root; ids carry an au-
+   prefix). Only what living in one page needs — the look is
+   AppUpload's.
+   ============================================================ */
+/* The section is AppUpload's page: its own type size (the site's body is
+   15px), filling the space under the site header. It keeps its layers to
+   itself, so the fixed video backdrop and scrim sit behind just this
+   section's content — and under the site's header and tab bar. */
+.au-root {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  display: flow-root;              /* the tabs' top margin stays inside the page */
+  font-size: 16px;
+  letter-spacing: normal;
+  text-align: left;
+  min-height: calc(100vh - var(--hdr, 0px) - var(--tabh, 0px));
+}
+@supports (height: 100dvh) {
+  .au-root { min-height: calc(100dvh - var(--hdr, 0px) - var(--tabh, 0px)); }
+}
+/* whatever the page scrolls into view (a form's first section, a banner, a
+   focused field) stops below the site's sticky header */
+html.sec-appupload { scroll-padding-top: var(--hdr, 0px); }
+/* The Sign Now window covers the whole screen, site header included, as it
+   does on its own (it opens in the browser's top layer). */
+.au-root .sign-modal[popover] {
+  margin: 0; border: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  overflow: auto; color: inherit; background: rgba(10, 20, 50, 0.55); inset: 0;
+}
+.au-root .sign-modal[popover]:not(:popover-open):not(.hidden) { display: flex; }
+/* (browsers without the top layer — iOS before 17: the section is lifted
+   over the header and tab bar while the window is open) */
+html.au-modal-open .au-root { z-index: 60; }
+
+/* The backdrop fills the whole screen, as on its own full window: the site's
+   header and tab bar turn see-through over it. The still image sits on its
+   own fixed layer too (iPhones ignore a fixed page background, which would
+   blow it up to the page's full height). */
+.au-root { background: #05080b; }
+.au-root::before {
+  content: ""; position: fixed; inset: 0;
+  z-index: -3; pointer-events: none;
+  background: #05080b url("../../backdrop.png") center / cover no-repeat;
+}
+/* (a video sizes itself from its picture unless it's given a height) */
+.au-root .bg-video, .au-root .bg-scrim { top: 0; bottom: auto; height: 100vh; }
+@supports (height: 100lvh) {
+  .au-root .bg-video, .au-root .bg-scrim { height: 100lvh; }
+}
+/* the site smooths its text thinner; AppUpload does that only on phones */
+@media (min-width: 769px) {
+  .au-root { -webkit-font-smoothing: auto; -moz-osx-font-smoothing: auto; }
+}
+/* the site's tab bar already clears the iPhone's home indicator */
+@media (max-width: 768px) {
+  .au-root main { padding-bottom: 28px; }
+}
+
+/* ---- On the phone and tablet (what the installed app showed) ---- */
+/* The glass and the video stay as they are. AppUpload's small navy
+   lettering on it (field labels, notes, links) gets a firmer version of the
+   white halo its cards already give their text, so it still reads when a
+   dark video frame is behind it. */
+.au-root .card .field > span, .au-root .card .history-note, .au-root .card .link-btn,
+.au-root .card .btn-ghost, .au-root .card .dropzone-secondary,
+.au-root .card .processing-msg,
+.au-root .card .pdf-name, .au-root .card .jump-form, .au-root .card .checkfield,
+.au-root .card .history-exp, .au-root .card .history-del, .au-root .card .history-meta,
+.au-root .card .history-empty, .au-root .card .history-more, .au-root .card .equip-sub > span,
+.au-root .card .section-note {
+  text-shadow: 0 0 1px #fff, 0 0 3px rgba(255, 255, 255, 0.95), 0 0 10px rgba(255, 255, 255, 0.7);
+}
+/* (AppUpload's controls are drawn light in both of the site's themes, as in
+   the original app — in the dark theme a control's own text would turn white) */
+.au-root { color-scheme: light; }
+/* One field per row on a phone: the column is the section's width, not the
+   width of a dropdown's longest choice (that pushed Equipment and Gift card
+   fields past the section's edge, arrows cut off). */
+.au-root .field input, .au-root .field select { min-width: 0; }
+@media (max-width: 768px) {
+  .au-root .field-row { grid-template-columns: minmax(0, 1fr); }
+}
+/* a box next to a two-line label keeps its size */
+.au-root .checkfield input { flex: none; }
+/* The Sign window on a short screen (a phone on its side) scrolls from its
+   top, clear of the notch and the home indicator; its outlines show on the
+   white card; what's missing is said in the window. */
+.au-root .sign-modal {
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+}
+.au-root .sign-card { margin: auto; }
+.au-root .sign-pad, .au-root .sign-type-input, .au-root .sign-type-preview, .au-root .sign-tab { border-color: #c3cde0; }
+.au-root .sign-err { margin: 12px 0 0; color: var(--danger); font-size: 0.9rem; font-weight: 600; }
+.au-root .sign-err:empty { display: none; }
+/* A touch screen as wide as a desktop (an iPad on its side) keeps the panel
+   full size (the smaller panel is for a mouse); the rep bar, which sits inside
+   the panel, isn't made smaller a second time. */
+@media (min-width: 1100px) and (pointer: coarse), (min-width: 1100px) and (hover: none) {
+  .au-root .mode-tabs, .au-root main { zoom: 1; }
+}
+@media (min-width: 1100px) {
+  .au-root main .rep-bar { zoom: 1; margin-right: auto; }
+}
+/* On any touch screen (an iPad, a phone on its side): 16px controls, so
+   focusing one doesn't zoom the page, and fingertip-sized buttons. */
+@media (pointer: coarse) {
+  .au-root input, .au-root select, .au-root textarea { font-size: 16px !important; }
+  .au-root .jump-form select, .au-root .field input:not([type=checkbox]), .au-root .field select { min-height: 44px; }
+  .au-root .thumb .remove-thumb { width: 38px; height: 38px; }
+  .au-root .history-actions .link-btn { min-height: 44px; padding: 0 4px; }
+  .au-root .history-exp, .au-root .history-del { width: 44px; height: 44px; }
+  .au-root .row-del { min-width: 44px; min-height: 44px; padding: 0 10px; }
+}
+
+/* ---- Past uploads & downloads: tidied, on the same glass ----
+   (the look only — the same header, search, rep filter and list. The card
+   is the same see-through glass as the ones above it, the video showing
+   through, with their white halo on the lettering; inside, each past upload
+   is a row with a document tile, the business, its form, rep and time, and
+   round Download and Remove buttons, all in lighter glass) */
+
+/* header: an icon, the title, and Export all / Clear history as small pills */
+.au-root #au-historySection .history-head { flex-wrap: wrap; gap: 10px 12px; }
+.au-root #au-historySection .step-title { font-size: 1.08rem; font-weight: 750; letter-spacing: -0.01em; color: var(--ink); }
+.au-root #au-historySection .step-num {
+  position: relative; width: 32px; height: 32px; border-radius: 10px; font-size: 0; color: transparent;
+  background: linear-gradient(135deg, #3565d6, #1e3f8f);
+  box-shadow: 0 6px 14px -6px rgba(30, 63, 143, 0.7);
+}
+.au-root #au-historySection .step-num::before {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 17px; height: 17px; background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5'/%3E%3Cpath d='M3.5 3.5v5h5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5'/%3E%3Cpath d='M3.5 3.5v5h5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.au-root #au-historySection .history-actions { gap: 8px; }
+.au-root #au-historySection .history-actions .link-btn {
+  display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border-radius: 999px;
+  font-size: 0.82rem; font-weight: 650; text-decoration: none;
+  color: var(--accent); background: rgba(232, 238, 249, 0.55); border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: background 0.15s, border-color 0.15s;
+}
+.au-root #au-historySection .history-actions .link-btn:hover { background: rgba(232, 238, 249, 0.8); }
+.au-root #au-historySection #au-clearHistoryBtn { color: #9c3a26; background: rgba(251, 236, 232, 0.55); }
+.au-root #au-historySection #au-clearHistoryBtn:hover { background: rgba(251, 236, 232, 0.8); }
+.au-root #au-historySection .history-note { margin: 8px 0 14px; font-size: 0.84rem; line-height: 1.45; color: var(--ink-soft); }
+
+/* search (with a magnifier) and the rep filter, the same height and look */
+.au-root #au-historySection .history-filters { gap: 8px; margin-bottom: 14px; }
+.au-root #au-historySection .history-search,
+.au-root #au-historySection .rep-filter {
+  height: 44px; margin: 0; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.55); background-color: rgba(255, 255, 255, 0.4);
+  color: var(--ink); font-size: 0.95rem; box-shadow: none;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+.au-root #au-historySection .history-search {
+  padding: 0 14px 0 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233a4d7a' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.6-3.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 14px 50%; background-size: 17px;
+}
+.au-root #au-historySection .history-search::placeholder { color: rgba(58, 77, 122, 0.8); }
+.au-root #au-historySection .rep-filter {
+  -webkit-appearance: none; appearance: none; padding: 0 38px 0 14px; font-weight: 600; min-width: 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%233a4d7a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px;
+}
+.au-root #au-historySection .history-search:focus,
+.au-root #au-historySection .rep-filter:focus {
+  outline: none; border-color: var(--accent); background-color: rgba(255, 255, 255, 0.75); box-shadow: 0 0 0 3px rgba(30, 63, 143, 0.14);
+}
+
+/* the list: one group of lighter glass, a hairline between rows */
+.au-root #au-historySection .history-list {
+  gap: 0; background: rgba(255, 255, 255, 0.28); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 16px; overflow: hidden;
+}
+.au-root #au-historySection .history-item { gap: 4px; padding: 6px 10px 6px 6px; }
+.au-root #au-historySection .history-list > li + li { border-top: 1px solid rgba(255, 255, 255, 0.5); }
+.au-root #au-historySection .history-open {
+  flex: 1; min-width: 0; display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; row-gap: 2px;
+  align-items: center; background: transparent; border: 0; border-radius: 12px; padding: 9px 8px;
+  transition: background 0.15s;
+}
+.au-root #au-historySection .history-open::before {
+  content: ""; grid-row: 1 / span 2; width: 40px; height: 40px; border-radius: 11px;
+  background: rgba(232, 238, 249, 0.7) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e3f8f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='M9 13h6M9 17h4'/%3E%3C/svg%3E") center / 20px no-repeat;
+}
+.au-root #au-historySection .history-open:hover { background: rgba(255, 255, 255, 0.3); border-color: transparent; }
+.au-root #au-historySection .history-open:active { background: rgba(255, 255, 255, 0.42); }
+.au-root #au-historySection .history-open strong {
+  grid-column: 2; font-size: 0.98rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.005em; color: var(--ink);
+}
+.au-root #au-historySection .history-meta { grid-column: 2; font-size: 0.8rem; line-height: 1.4; color: var(--ink-soft); }
+
+/* Download (tinted) and Remove (quiet until touched), drawn as icons */
+.au-root #au-historySection .history-exp,
+.au-root #au-historySection .history-del {
+  position: relative; width: 40px; height: 40px; border-radius: 50%; font-size: 0; color: transparent;
+}
+.au-root #au-historySection .history-exp::before,
+.au-root #au-historySection .history-del::before {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px;
+}
+.au-root #au-historySection .history-exp { background: rgba(232, 238, 249, 0.75); }
+.au-root #au-historySection .history-exp:hover { background: rgba(232, 238, 249, 0.95); }
+.au-root #au-historySection .history-exp::before {
+  background: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpath d='m7 10.5 5 5 5-5'/%3E%3Cpath d='M5 20h14'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpath d='m7 10.5 5 5 5-5'/%3E%3Cpath d='M5 20h14'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.au-root #au-historySection .history-del { background: transparent; }
+.au-root #au-historySection .history-del:hover { background: rgba(253, 236, 234, 0.8); }
+.au-root #au-historySection .history-del::before {
+  width: 17px; height: 17px; background: var(--ink-soft); transition: background 0.15s;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.au-root #au-historySection .history-del:hover::before { background: var(--danger); }
+.au-root #au-historySection .history-exp:focus-visible,
+.au-root #au-historySection .history-del:focus-visible,
+.au-root #au-historySection .history-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* nothing saved / no matches, and the "+N older" line: quiet, centred */
+.au-root #au-historySection .history-empty { padding: 22px 16px; text-align: center; font-size: 0.9rem; color: var(--ink-soft); }
+.au-root #au-historySection .history-more {
+  padding: 12px 16px; text-align: center; font-style: normal; font-size: 0.8rem; color: var(--ink-soft); background: rgba(255, 255, 255, 0.18);
+}
+
+/* a phone: a touch less padding; fingertip-sized buttons on any touch screen */
+@media (max-width: 768px) {
+  .au-root #au-historySection .rep-filter { min-width: 0; }
+  .au-root #au-historySection .history-item { gap: 2px; padding: 4px 4px 4px 4px; }
+}
+/* a narrow phone: the business gets the row's width (no document tile) */
+@media (max-width: 480px) {
+  .au-root #au-historySection .history-open { grid-template-columns: minmax(0, 1fr); padding: 10px 8px 10px 12px; }
+  .au-root #au-historySection .history-open::before { display: none; }
+  .au-root #au-historySection .history-open strong, .au-root #au-historySection .history-meta { grid-column: 1; }
+}
+@media (pointer: coarse) {
+  .au-root #au-historySection .history-actions .link-btn { min-height: 44px; padding: 0 16px; }
+  .au-root #au-historySection .history-exp, .au-root #au-historySection .history-del { width: 44px; height: 44px; }
+}

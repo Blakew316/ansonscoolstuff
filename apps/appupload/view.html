@@ -1,0 +1,245 @@
+<!-- AppUpload (from the AppUpload app, appupload main). Ids carry an au- prefix. -->
+<!-- Rotating site backdrop. Two stacked players double-buffer the numbered
+         playlist videos (100.mp4…106.mp4) so each hand-off crossfades with no
+         black flash; when none are present the classic backdrop.mp4 loops.
+         backdrop.png doubles as poster and reduced-motion / load-failure
+         fallback; the scrim keeps text readable over bright frames. -->
+    <video id="au-bgVideoA" class="bg-video" muted playsinline preload="auto" poster="backdrop.png" aria-hidden="true" tabindex="-1"></video>
+    <video id="au-bgVideoB" class="bg-video bg-video-hidden" muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+    <div class="bg-scrim" aria-hidden="true"></div>
+    <nav class="mode-tabs" role="tablist" aria-label="Workflow">
+      <button id="au-tabApp" class="mode-tab active" role="tab" aria-selected="true">Merchant Application</button>
+      <button id="au-tabMenu" class="mode-tab" role="tab" aria-selected="false">Menu → Clover</button>
+    </nav>
+
+    <main>
+      <div id="au-statusBanner" class="banner hidden" role="status"></div>
+
+      <!-- ============ APPLICATION MODE ============ -->
+      <div id="au-appMode">
+        <div class="rep-bar">
+          <label>Sales rep
+            <select id="au-repInput"><option value="">Select rep…</option></select>
+          </label>
+        </div>
+
+        <!-- Step 1: upload -->
+        <section id="au-appUpload" class="card">
+          <div class="upload-head">
+            <h2 class="step-title"><span class="step-num">1</span> Upload the application &amp; supporting documents</h2>
+            <label class="jump-form">
+              <span>Or fill a form manually</span>
+              <select id="au-homeFormSelect">
+                <option value="">Choose a form…</option>
+                <option value="citizens">Citizens Application</option>
+                <option value="merrick">Merrick Application</option>
+                <option value="fd_north">FD North Application</option>
+                <option value="pbt">PB&amp;T Application</option>
+                <option value="coversheet">Required Set-Up coversheet</option>
+                <option value="po">Purchase Order</option>
+                <option value="clover">Clover Addendum</option>
+                <option value="bankchange">Bank Account Change Request</option>
+                <option value="crf">CRF</option>
+                <option value="hempcbd">Hemp &amp; CBD Disclosure</option>
+                <option value="cbdamendment">CBD Amendment</option>
+                <option value="giftcard">Gift Card Setup</option>
+                <option value="cashadvance">Cash Advance Application</option>
+                <option value="factor4">Factor4 Merchant Set-Up (Gift &amp; Loyalty)</option>
+                <option value="greenlight">Greenlight Payments CBD Merchant Application</option>
+                <option value="pathward">Pathward Merchant Application</option>
+                <option value="pathward_guide">Pathward Program Guide</option>
+              </select>
+            </label>
+          </div>
+          <div id="au-appDropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload images">
+            <input id="au-appFileInput" type="file" accept="image/*,application/pdf,.pdf" multiple hidden />
+            <div class="dropzone-inner">
+              <p class="dropzone-primary">Drag &amp; drop photos or a PDF here</p>
+              <p class="dropzone-secondary">or <button type="button" id="au-appBrowseBtn" class="link-btn">browse / take a photo</button></p>
+            </div>
+          </div>
+          <ul id="au-appThumbs" class="thumb-list" aria-live="polite"></ul>
+          <div class="actions">
+            <button id="au-extractBtn" class="btn btn-primary" disabled>Read &amp; detect</button>
+            <button id="au-appClearBtn" class="btn btn-ghost hidden">Clear all</button>
+          </div>
+        </section>
+
+        <!-- Past uploads & downloads -->
+        <section id="au-historySection" class="card hidden">
+          <div class="history-head">
+            <h2 class="step-title" style="margin:0"><span class="step-num">★</span> Past uploads &amp; downloads</h2>
+            <div class="history-actions">
+              <button id="au-exportAllBtn" type="button" class="link-btn">Export all</button>
+              <button id="au-clearHistoryBtn" type="button" class="link-btn">Clear history</button>
+            </div>
+          </div>
+          <p id="au-historyNote" class="muted small history-note">Click one to reopen and fill more forms.</p>
+          <div class="history-filters">
+            <input id="au-historySearch" type="search" class="history-search" placeholder="Search by business name or form type…" aria-label="Search past submissions" />
+            <select id="au-repFilter" class="rep-filter" aria-label="Filter by rep">
+              <option value="">All reps</option>
+            </select>
+          </div>
+          <ul id="au-historyList" class="history-list"></ul>
+        </section>
+
+        <!-- Step 2: processing -->
+        <section id="au-appProcessing" class="card hidden">
+          <div class="spinner" aria-hidden="true"></div>
+          <p id="au-appProcessingMsg" class="processing-msg">Reading the application &amp; documents…</p>
+        </section>
+
+        <!-- Step 3: review + generate -->
+        <section id="au-appReview" class="card hidden">
+          <div class="result-head">
+            <h2 class="step-title"><span class="step-num">2</span> Review &amp; complete</h2>
+            <div class="head-right">
+              <div id="au-detectBadge" class="detect-badge"></div>
+              <label class="jump-form">
+                <span>Fill fields for form</span>
+                <select id="au-jumpFormSelect">
+                  <option value="">All sections</option>
+                  <option value="citizens">Citizens Application</option>
+                  <option value="merrick">Merrick Application</option>
+                  <option value="fd_north">FD North Application</option>
+                  <option value="pbt">PB&amp;T Application</option>
+                  <option value="coversheet">Required Set-Up coversheet</option>
+                  <option value="po">Purchase Order</option>
+                  <option value="clover">Clover Addendum</option>
+                  <option value="bankchange">Bank Account Change Request</option>
+                  <option value="crf">CRF</option>
+                  <option value="hempcbd">Hemp &amp; CBD Disclosure</option>
+                  <option value="cbdamendment">CBD Amendment</option>
+                  <option value="giftcard">Gift Card Setup</option>
+                  <option value="cashadvance">Cash Advance Application</option>
+                  <option value="factor4">Factor4 Merchant Set-Up (Gift &amp; Loyalty)</option>
+                  <option value="greenlight">Greenlight Payments CBD Merchant Application</option>
+                  <option value="pathward">Pathward Merchant Application</option>
+                  <option value="pathward_guide">Pathward Program Guide</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <datalist id="au-equipmentModels"></datalist>
+          <div class="field-row">
+            <label class="field">
+              <span>Application form</span>
+              <select id="au-appTypeSelect">
+                <option value="citizens">Citizens (Priority / Citizens Bank)</option>
+                <option value="merrick">Merrick Bank</option>
+                <option value="fd_north">FD North (Priority / Synovus Bank)</option>
+                <option value="pbt">PB&amp;T (Priority / Pueblo Bank &amp; Trust)</option>
+                <option value="greenlight">Greenlight Payments (CBD)</option>
+                <option value="pathward">Pathward (Wholesale Payments / Pathward, N.A.)</option>
+                <option value="pathward_guide">Pathward Program Guide (Confirmation Page)</option>
+                <option value="unknown">Unknown — coversheet only</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Coversheet date</span>
+              <input id="au-coverDate" type="text" placeholder="MM/DD/YYYY" />
+            </label>
+          </div>
+
+          <div id="au-reviewForm"></div>
+
+          <div class="sign-bar">
+            <button id="au-signNowBtn" type="button" class="btn btn-sign">✍ Sign now — Owner 1</button>
+            <span id="au-signStatus" class="sign-status" aria-live="polite"></span>
+          </div>
+
+          <div class="generate-actions">
+            <p class="dl-title">Choose the documents to download</p>
+            <div class="dl-picker">
+              <label class="dl-check"><input type="checkbox" id="au-dlCover" value="coversheet" /><span>Coversheet</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlApp" value="application" /><span>Application (Citizens / Merrick / FD North / PB&amp;T / Greenlight / Pathward / Pathward guide)</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlPo" value="po" /><span>Purchase order</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlClover" value="clover" /><span>Clover addendum</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlBankChange" value="bankchange" /><span>Bank account change</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlCrf" value="crf" /><span>Change request (CRF)</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlHempCbd" value="hempcbd" /><span>Hemp &amp; CBD disclosure</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlCbdAmend" value="cbdamendment" /><span>CBD amendment</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlGiftCard" value="giftcard" /><span>Gift card setup</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlCashAdvance" value="cashadvance" /><span>Cash advance application</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlFactor4" value="factor4" /><span>Factor4 merchant set-up</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlGreenlight" value="greenlight" /><span>Greenlight CBD application</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlPathward" value="pathward" /><span>Pathward application</span></label>
+              <label class="dl-check"><input type="checkbox" id="au-dlPathwardGuide" value="pathward_guide" /><span>Pathward program guide</span></label>
+            </div>
+            <div class="actions wrap">
+              <button id="au-genSelectedBtn" class="btn btn-primary" disabled>Download selected</button>
+              <button id="au-appRestartBtn" class="btn btn-ghost">Start over</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ MENU MODE ============ -->
+      <div id="au-menuMode" class="hidden">
+        <section id="au-menuUpload" class="card">
+          <h2 class="step-title"><span class="step-num">1</span> Upload the menu</h2>
+          <div id="au-menuDropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload menu photos">
+            <input id="au-menuFileInput" type="file" accept="image/*,application/pdf,.pdf" multiple hidden />
+            <div class="dropzone-inner">
+              <p class="dropzone-primary">Drag &amp; drop menu photos or a PDF here</p>
+              <p class="dropzone-secondary">or <button type="button" id="au-menuBrowseBtn" class="link-btn">browse / take a photo</button></p>
+            </div>
+          </div>
+          <ul id="au-menuThumbs" class="thumb-list" aria-live="polite"></ul>
+          <div class="actions">
+            <button id="au-menuExtractBtn" class="btn btn-primary" disabled>Read menu</button>
+            <button id="au-menuClearBtn" class="btn btn-ghost hidden">Clear all</button>
+          </div>
+        </section>
+
+        <section id="au-menuProcessing" class="card hidden">
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="processing-msg">Reading the menu…</p>
+        </section>
+
+        <section id="au-menuReview" class="card hidden">
+          <h2 class="step-title"><span class="step-num">2</span> Review items</h2>
+          <label class="field" style="max-width: 320px">
+            <span>Restaurant name (file name)</span>
+            <input id="au-restaurantName" type="text" placeholder="Restaurant name" />
+          </label>
+          <div class="table-wrap">
+            <table id="au-menuTable" class="menu-table">
+              <thead><tr><th>Name</th><th>Price</th><th>Category</th><th>Description</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="actions wrap">
+            <button id="au-addItemBtn" class="btn btn-ghost">+ Add item</button>
+            <button id="au-genXlsxBtn" class="btn btn-primary">Download Clover .xlsx</button>
+            <button id="au-menuRestartBtn" class="btn btn-ghost">Start over</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Sign Now modal: Owner 1 draws or types a signature -->
+    <div id="au-signModal" class="sign-modal hidden" role="dialog" aria-modal="true" aria-labelledby="au-signModalTitle">
+      <div class="sign-card">
+        <h3 id="au-signModalTitle" class="sign-modal-title">Sign — Owner 1</h3>
+        <p class="sign-modal-help">Draw your signature in the box, or switch to Type. This signs the application for Owner 1 only.</p>
+        <div class="sign-tabs" role="tablist">
+          <button type="button" id="au-signTabDraw" class="sign-tab active" role="tab">Draw</button>
+          <button type="button" id="au-signTabType" class="sign-tab" role="tab">Type</button>
+        </div>
+        <div id="au-signDrawPane" class="sign-pane">
+          <canvas id="au-signPad" class="sign-pad" width="640" height="220"></canvas>
+        </div>
+        <div id="au-signTypePane" class="sign-pane hidden">
+          <input id="au-signTypeInput" type="text" class="sign-type-input" placeholder="Type your full legal name" autocomplete="name" />
+          <div id="au-signTypePreview" class="sign-type-preview" aria-hidden="true"></div>
+        </div>
+        <p id="au-signErr" class="sign-err" role="alert"></p>
+        <div class="sign-modal-actions">
+          <button type="button" id="au-signClearBtn" class="btn btn-ghost">Clear</button>
+          <button type="button" id="au-signCancelBtn" class="btn btn-ghost">Cancel</button>
+          <button type="button" id="au-signApplyBtn" class="btn btn-primary">Apply signature</button>
+        </div>
+      </div>
+    </div>

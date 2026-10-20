@@ -1,0 +1,213 @@
+<!-- Appointments (Team Ice Kannon). Ids carry an ap- prefix. -->
+<!-- ===================== App bar ===================== -->
+<header class="appbar">
+  <button id="ap-btn-menu" class="icon-btn" aria-label="Main menu" title="Main menu">
+    <svg viewBox="0 0 24 24" class="ic"><g stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></g></svg>
+  </button>
+
+
+  <button id="ap-nav-today" class="ghost-btn" title="Today (T)">Today</button>
+
+  <div class="datenav">
+    <button id="ap-nav-prev" class="icon-btn small" aria-label="Previous" title="Previous (←)">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="ap-nav-next" class="icon-btn small" aria-label="Next" title="Next (→)">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <h1 id="ap-current-label" class="current-label">—</h1>
+
+  <div class="appbar-right">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" class="ic search-ic"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      <input id="ap-search" class="search-input" type="search" placeholder="Search appointments" aria-label="Search appointments" autocomplete="off" spellcheck="false">
+      <button id="ap-search-clear" class="icon-btn small search-clear" aria-label="Clear search" hidden>
+        <svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <button id="ap-btn-refresh" class="icon-btn" title="Refresh (R)" aria-label="Refresh appointments">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20 3v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="ap-btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.4.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.4-.9a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="viewswitch" role="radiogroup" aria-label="View switcher">
+      <button class="vs-btn is-active" data-view="day"      role="radio" aria-checked="true"  title="Day (D)">Day</button>
+      <button class="vs-btn"           data-view="week"     role="radio" aria-checked="false" title="Week (W)">Week</button>
+      <button class="vs-btn"           data-view="month"    role="radio" aria-checked="false" title="Month (M)">Month</button>
+      <button class="vs-btn"           data-view="schedule" role="radio" aria-checked="false" title="Schedule (A)">Schedule</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== Body: sidebar + calendar ===================== -->
+<div class="shell">
+
+  <aside id="ap-sidebar" class="sidebar" aria-label="Calendar navigation">
+    <!-- Brand header (shown only when the appbar drops the logo on phones) -->
+    <div class="sidebar-brand">
+      <img class="brand-logo-img" src="img/logo-light.webp" width="484" height="120" alt="Wholesale Payments">
+      <span class="sidebar-brand-team" id="ap-team-name">Team&nbsp;Ice&nbsp;Kannon</span>
+    </div>
+
+    <!-- Mini month -->
+    <div class="mini">
+      <div class="mini-head">
+        <span id="ap-mini-label" class="mini-label">—</span>
+        <div class="mini-nav">
+          <button id="ap-mini-prev" class="icon-btn small" aria-label="Previous month">
+            <svg viewBox="0 0 24 24" class="ic"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button id="ap-mini-next" class="icon-btn small" aria-label="Next month">
+            <svg viewBox="0 0 24 24" class="ic"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="ap-mini-grid" class="mini-grid"></div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title"><span id="ap-glance-title">Today at a glance</span></div>
+      <div id="ap-side-stats" class="side-stats"></div>
+    </div>
+  </aside>
+
+  <div id="ap-sidebar-scrim" class="sidebar-scrim" hidden></div>
+
+  <main class="content">
+    <div id="ap-banner" class="banner" hidden></div>
+    <div id="ap-view-host" class="view-host"></div>
+    <button id="ap-btn-add" class="fab" type="button" aria-label="Add an appointment, meeting or event" title="Add (C)" hidden><svg viewBox="0 0 24 24" class="ic"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  </main>
+</div>
+
+<!-- ===================== Overlays ===================== -->
+<div id="ap-popover-layer"></div>
+
+<div id="ap-settings-backdrop" class="backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ap-settings-title">
+    <div class="modal-head">
+      <h2 id="ap-settings-title">Settings</h2>
+      <button id="ap-settings-close" class="icon-btn" aria-label="Close settings">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="cal-set" id="ap-cal-set">
+      <div class="cal-head">
+        <span class="cal-dot" aria-hidden="true"></span>
+        <div>
+          <div class="settings-row-title">Your Calendly</div>
+          <div class="settings-row-sub" id="ap-cal-state">Not connected</div>
+        </div>
+      </div>
+      <div id="ap-cal-connect">
+        <label class="field-label" for="ap-cal-token">Calendly personal access token</label>
+        <div class="cal-row">
+          <input id="ap-cal-token" class="field cal-token" type="text" name="calendly-api-token" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" placeholder="Paste your token here">
+          <button id="ap-cal-go" class="primary-btn" type="button">Connect</button>
+        </div>
+        <p class="field-hint">Get one in Calendly: <a class="detail-link" href="https://calendly.com/integrations/api_webhooks" target="_blank" rel="noopener noreferrer">Integrations → API &amp; Webhooks</a> → <strong>Get a token now</strong> (or <em>Generate new token</em>), name it, <strong>Create token</strong>, then <strong>Copy token</strong> and paste it here. It’s kept on the site’s server under your sign-in, never shown again — and no one else on the team sees it or your Calendly events.</p>
+      </div>
+      <div class="cal-on" id="ap-cal-on" hidden>
+        <button id="ap-cal-sync" class="ghost-btn" type="button">Sync now</button>
+        <button id="ap-cal-off" class="ghost-btn" type="button">Disconnect</button>
+      </div>
+      <p class="settings-status cal-status" id="ap-cal-status" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-title">Demo data</div>
+        <div class="settings-row-sub">Preview the calendar with sample appointments</div>
+      </div>
+      <button id="ap-demo-toggle" class="switch" role="switch" aria-checked="false" aria-label="Use demo data"><span class="knob"></span></button>
+    </div>
+
+    <div class="settings-row ap-theme-row">
+      <div>
+        <div class="settings-row-title">Appearance</div>
+        <div class="settings-row-sub">Follows your device by default</div>
+      </div>
+      <div class="seg mini-seg" role="radiogroup" aria-label="Theme">
+        <button class="seg-btn" data-theme-pick="system">Auto</button>
+        <button class="seg-btn" data-theme-pick="light">Light</button>
+        <button class="seg-btn" data-theme-pick="dark">Dark</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <span id="ap-settings-status" class="settings-status"></span>
+      <button id="ap-settings-close-m" class="ghost-btn settings-close-mobile">Close</button>
+    </div>
+    <p id="ap-conn-status" class="conn-status"></p>
+  </div>
+</div>
+
+<!-- ===================== Add / edit a hand-entered entry ===================== -->
+<div id="ap-event-backdrop" class="backdrop" hidden>
+  <div class="modal ev-modal" role="dialog" aria-modal="true" aria-labelledby="ap-event-title">
+    <div class="modal-head">
+      <h2 id="ap-event-title">New appointment</h2>
+      <button id="ap-event-close" class="icon-btn" type="button" aria-label="Close"><svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="seg ev-kinds" role="radiogroup" aria-label="Type">
+      <button class="seg-btn" type="button" role="radio" data-kind="appointment">Appointment</button>
+      <button class="seg-btn" type="button" role="radio" data-kind="meeting">Meeting</button>
+      <button class="seg-btn" type="button" role="radio" data-kind="event">Event</button>
+    </div>
+    <label class="field-label" for="ap-ev-title">Title</label>
+    <input id="ap-ev-title" class="field" maxlength="200" autocomplete="off" placeholder="Merchant or what it’s about">
+    <label class="field-label" for="ap-ev-agent">For</label>
+    <select id="ap-ev-agent" class="field"></select>
+    <div class="ev-when">
+      <div class="ev-date"><label class="field-label" for="ap-ev-date">Date</label><input id="ap-ev-date" class="field" type="date"></div>
+      <div class="ev-allday"><span class="field-label">All day</span><button id="ap-ev-allday" class="switch" type="button" role="switch" aria-checked="false" aria-label="All day"><span class="knob"></span></button></div>
+    </div>
+    <div class="ev-times" id="ap-ev-times">
+      <div><label class="field-label" for="ap-ev-start">Starts</label><input id="ap-ev-start" class="field" type="time" step="900"></div>
+      <div><label class="field-label" for="ap-ev-end">Ends</label><input id="ap-ev-end" class="field" type="time" step="900"></div>
+    </div>
+    <label class="field-label" for="ap-ev-location">Location</label>
+    <input id="ap-ev-location" class="field" maxlength="300" autocomplete="off" placeholder="Address or place">
+    <label class="field-label" for="ap-ev-phone">Phone</label>
+    <input id="ap-ev-phone" class="field" type="tel" maxlength="40" autocomplete="off">
+    <label class="field-label" for="ap-ev-notes">Notes</label>
+    <textarea id="ap-ev-notes" class="field" rows="3" maxlength="2000"></textarea>
+    <p class="field-hint">Saved to your calendar on this device.</p>
+    <div class="modal-actions">
+      <span id="ap-ev-status" class="settings-status"></span>
+      <button id="ap-ev-delete" class="ghost-btn ev-del" type="button" hidden>Delete</button>
+      <button id="ap-ev-cancel" class="ghost-btn" type="button">Cancel</button>
+      <button id="ap-ev-save" class="primary-btn" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="ap-shortcuts-backdrop" class="backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ap-sc-title">
+    <div class="modal-head">
+      <h2 id="ap-sc-title">Keyboard shortcuts</h2>
+      <button id="ap-shortcuts-close" class="icon-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <dl class="sc-list">
+      <div><dt><kbd>D</kbd></dt><dd>Day view</dd></div>
+      <div><dt><kbd>W</kbd></dt><dd>Week view</dd></div>
+      <div><dt><kbd>M</kbd></dt><dd>Month view</dd></div>
+      <div><dt><kbd>A</kbd></dt><dd>Schedule view</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>Jump to today</dd></div>
+      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next period</dd></div>
+      <div><dt><kbd>R</kbd></dt><dd>Refresh</dd></div>
+      <div><dt><kbd>C</kbd></dt><dd>Add an appointment, meeting or event</dd></div>
+      <div><dt><kbd>/</kbd></dt><dd>Search appointments</dd></div>
+      <div><dt><kbd>?</kbd></dt><dd>This help</dd></div>
+      <div><dt><kbd>Esc</kbd></dt><dd>Close dialogs</dd></div>
+    </dl>
+  </div>
+</div>

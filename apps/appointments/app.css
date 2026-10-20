@@ -1,0 +1,1019 @@
+/* ============================================================
+   Team Ice Kannon · Appointments — Wholesale Payments
+   Google-Calendar-style layout · brand hues as subtle tints
+   ============================================================ */
+
+.ap-root {
+  /* Wholesale Payments brand */
+  --wp-navy:    #16204F;
+  --wp-blue:    #1E8FE8;
+  --wp-sky:     #18A0E8;
+  --wp-green:   #2EB875;
+  --wp-green-2: #3EC97D;
+  --wp-mint:    #71DC8B;
+  --wp-gray:    #A7ABB3;
+
+  /* Light theme */
+  --bg:        #ffffff;
+  --canvas:    #ffffff;
+  --surface:   #ffffff;
+  --surface-2: #f6f8fb;
+  --rail:      #f5f7fb;
+  --text:      #17204a;
+  --text-2:    #566079;
+  --text-3:    #8992a8;
+  --line:      #e6e9f2;
+  --line-soft: #eef1f7;
+  --hairline:  #eaedf4;
+  --shadow-sm: 0 1px 2px rgba(22, 32, 79, 0.06);
+  --shadow-md: 0 2px 6px rgba(22, 32, 79, 0.08), 0 8px 24px rgba(22, 32, 79, 0.08);
+  --shadow-lg: 0 20px 55px rgba(22, 32, 79, 0.20);
+  --wash-a: rgba(30, 143, 232, 0.045);
+  --wash-b: rgba(46, 184, 117, 0.04);
+  --appbar-bg: #ffffff;
+  --brand-word: var(--wp-navy);
+  --today-wash: rgba(30, 143, 232, 0.055);
+  --hover: rgba(22, 32, 79, 0.045);
+  --tint: 12%;
+  --pill-text-dark: #17204a;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Dark: near-black neutral base (Apple-style) — the saturated navy lives in
+   accents and brand hues, not in the backgrounds, so event colors stay clean */
+:root[data-theme="dark"] .ap-root {
+  --bg:        #0a0c12;
+  --canvas:    #0e1017;
+  --surface:   #171a22;
+  --surface-2: #12141b;
+  --rail:      #0c0e14;
+  --text:      #f2f4f9;
+  --text-2:    #a9afbe;
+  --text-3:    #6d7383;
+  --line:      rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.055);
+  --hairline:  rgba(255, 255, 255, 0.065);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.32), 0 12px 30px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --wash-a: rgba(30, 143, 232, 0.045);
+  --wash-b: rgba(46, 184, 117, 0.035);
+  --appbar-bg: #0e1017;
+  --brand-word: #ffffff;
+  --today-wash: rgba(30, 143, 232, 0.09);
+  --hover: rgba(255, 255, 255, 0.06);
+  --tint: 17%;
+  --pill-text-dark: #f2f4f9;
+}
+
+.ap-root * { box-sizing: border-box; }
+.ap-root { -webkit-text-size-adjust: 100%; background: var(--bg); height: 100%; }
+.ap-root [hidden] { display: none !important; }
+
+.ap-root {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Installed app (PWA): there is no collapsing browser chrome, and iOS
+   standalone under-reports 100dvh by the status-bar inset — which strands
+   the bottom nav above a dead strip. The large viewport is the full screen
+   there, so size the app by it. */
+@media (display-mode: standalone) {
+  .ap-root { height: 100vh; height: 100lvh; }
+}
+
+.ap-root button { font-family: inherit; font-size: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.ap-root input { font-family: inherit; }
+
+/* ---------------- App bar ---------------- */
+
+.ap-root .appbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 60px;
+  padding: 0 12px 0 8px;
+  background: var(--appbar-bg);
+  border-bottom: 1px solid var(--line);
+  z-index: 40;
+}
+
+.ap-root .brand { display: flex; align-items: center; text-decoration: none; color: inherit; flex: none; }
+.ap-root .brand-logo-img { height: 30px; width: auto; display: block; }
+/* Dark mode swaps in assets/logo-dark.png (white wordmark) via applyTheme() —
+   no white chip needed behind the logo. */
+
+/* text fallback until logo loads */
+
+.ap-root .ghost-btn {
+  margin-left: 14px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  white-space: nowrap;
+  flex: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+@media (hover: hover) { .ap-root .ghost-btn:hover { background: var(--hover); } }
+
+.ap-root .datenav { display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; flex: none; }
+
+.ap-root .icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  color: var(--text-2);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+  flex: none;
+}
+@media (hover: hover) { .ap-root .icon-btn:hover { background: var(--hover); color: var(--text); } }
+.ap-root .icon-btn:active { transform: scale(0.92); }
+.ap-root .icon-btn.small { width: 34px; height: 34px; }
+.ap-root .icon-btn:focus-visible,.ap-root  .ghost-btn:focus-visible,.ap-root  .vs-btn:focus-visible,.ap-root 
+.chip:focus-visible,.ap-root  .link-btn:focus-visible {
+  outline: 2.5px solid color-mix(in srgb, var(--wp-blue) 62%, transparent);
+  outline-offset: 2px;
+}
+.ap-root .ic { width: 20px; height: 20px; display: block; }
+.ap-root .icon-btn.spinning .ic { animation: ap-spin 0.9s linear infinite; }
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+
+
+.ap-root .current-label {
+  margin: 0 0 0 8px;
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 650;
+  letter-spacing: -0.022em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 40px;
+}
+
+.ap-root .appbar-right { display: flex; align-items: center; gap: 4px; flex: none; }
+
+/* Search */
+.ap-root .search-wrap {
+  display: flex; align-items: center; gap: 6px;
+  height: 40px; padding: 0 8px 0 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  width: 210px;
+  transition: background 0.15s ease, border-color 0.15s ease, width 0.2s ease;
+}
+.ap-root .search-wrap:focus-within { background: var(--surface); border-color: var(--line); width: 250px; }
+.ap-root .search-ic { width: 18px; height: 18px; color: var(--text-3); flex: none; }
+.ap-root .search-input {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: none;
+  font-size: 13.5px; color: var(--text);
+  -webkit-appearance: none; appearance: none;
+}
+/* the ✕ next to it clears it — no second (native) one */
+.ap-root .search-input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+.ap-root .search-input::placeholder { color: var(--text-3); }
+.ap-root .search-clear { width: 28px; height: 28px; }
+
+/* View switcher */
+.ap-root .viewswitch {
+  display: inline-flex;
+  margin-left: 6px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  gap: 2px;
+}
+.ap-root .vs-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-2);
+  white-space: nowrap;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+.ap-root .vs-btn.is-active { background: var(--surface); color: var(--wp-blue); box-shadow: var(--shadow-sm); }
+
+/* ---------------- Shell (sidebar + content) ---------------- */
+
+.ap-root .shell { flex: 1; display: flex; min-height: 0; }
+
+.ap-root .sidebar {
+  flex: none;
+  width: 256px;
+  background: var(--rail);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 12px 24px;
+  scrollbar-width: thin;
+}
+
+.ap-root .sidebar-scrim {
+  position: fixed; inset: 0; z-index: 44;
+  background: rgba(9, 12, 30, 0.4);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+
+/* Mini month */
+.ap-root .mini { padding: 6px 6px 12px; }
+.ap-root .mini-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ap-root .mini-label { font-size: 13.5px; font-weight: 650; letter-spacing: -0.01em; padding-left: 6px; }
+.ap-root .mini-nav { display: flex; gap: 2px; }
+.ap-root .mini-nav .icon-btn.small { width: 30px; height: 30px; }
+.ap-root .mini-nav .ic { width: 16px; height: 16px; }
+
+.ap-root .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.ap-root .mini-dow {
+  text-align: center; font-size: 10px; font-weight: 600; color: var(--text-3);
+  height: 22px; line-height: 22px;
+}
+.ap-root .mini-day {
+  position: relative;
+  aspect-ratio: 1; min-height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11.5px; font-weight: 550;
+  color: var(--text-2);
+  border-radius: 50%;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+@media (hover: hover) { .ap-root .mini-day:hover { background: var(--hover); } }
+.ap-root .mini-day.is-out { color: var(--text-3); opacity: 0.5; }
+.ap-root .mini-day.has-ev::after {
+  content: ""; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--wp-green);
+}
+.ap-root .mini-day.is-today { background: color-mix(in srgb, var(--wp-blue) 14%, transparent); color: var(--wp-blue); font-weight: 700; }
+.ap-root .mini-day.is-sel { box-shadow: inset 0 0 0 1.6px color-mix(in srgb, var(--wp-blue) 60%, transparent); color: var(--text); }
+.ap-root .mini-day.is-today.is-sel { background: var(--wp-blue); color: #fff; box-shadow: none; }
+
+/* Sidebar sections */
+.ap-root .side-section { margin-top: 18px; padding: 0 4px; }
+.ap-root .side-title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 8px; padding: 0 4px;
+}
+.ap-root .link-btn { color: var(--wp-blue); font-weight: 600; }
+@media (hover: hover) { .ap-root .link-btn:hover { text-decoration: underline; } }
+
+
+.ap-root .side-stats { display: flex; flex-direction: column; gap: 7px; }
+.ap-root .side-stat {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 11px; border-radius: 11px;
+  background: var(--surface); border: 1px solid var(--line-soft);
+}
+.ap-root .side-stat .ss-num { font-size: 19px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ss-c, var(--wp-blue)); flex: none; min-width: 30px; }
+.ap-root .side-stat .ss-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
+
+/* Glance tiles are clickable — they open a breakdown panel */
+.ap-root button.side-stat { cursor: pointer; width: 100%; text-align: left; transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease; }
+@media (hover: hover) { .ap-root button.side-stat:hover { background: var(--hover); border-color: color-mix(in srgb, var(--ss-c, var(--wp-blue)) 30%, transparent); } }
+.ap-root button.side-stat:active { transform: scale(0.985); }
+.ap-root .ss-chev { margin-left: auto; color: var(--text-3); font-size: 15px; font-weight: 600; line-height: 1; }
+@media (hover: hover) { .ap-root button.side-stat:hover .ss-chev { color: var(--ss-c, var(--wp-blue)); } }
+
+/* Breakdown panel */
+.ap-root .glance-sub { font-size: 12.5px; color: var(--text-2); margin-top: 2px; }
+.ap-root .glance-list { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.ap-root .glance-empty { padding: 28px 8px; text-align: center; color: var(--text-3); font-size: 13px; }
+.ap-root .gl-agent-head { display: flex; align-items: center; gap: 8px; margin: 12px 2px 3px; font-size: 13px; }
+.ap-root .gl-agent-head:first-child { margin-top: 2px; }
+.ap-root .gl-agent-head b { font-weight: 650; letter-spacing: -0.01em; }
+.ap-root .gl-cnt { margin-left: auto; font-size: 11.5px; color: var(--text-3); }
+
+/* ---------------- Content / views ---------------- */
+
+.ap-root .content { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--canvas); position: relative; }
+.ap-root .content::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(46rem 26rem at 8% -6%, var(--wash-a), transparent 60%),
+    radial-gradient(46rem 26rem at 96% -8%, var(--wash-b), transparent 60%);
+}
+.ap-root .banner,.ap-root  .view-host { position: relative; z-index: 1; }
+
+.ap-root .banner {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 12px 16px 0; padding: 11px 15px; border-radius: 13px;
+  font-size: 13px;
+  border: 1px solid color-mix(in srgb, var(--wp-blue) 22%, transparent);
+  background: color-mix(in srgb, var(--wp-blue) 6%, var(--surface));
+  color: var(--text); flex: none;
+}
+.ap-root .banner.warn { border-color: color-mix(in srgb, #e0932f 34%, transparent); background: color-mix(in srgb, #e0932f 8%, var(--surface)); }
+.ap-root .banner .link-btn { font-weight: 700; }
+
+.ap-root .view-host { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 14px 16px 16px; }
+
+.ap-root .view { flex: 1; min-height: 0; display: flex; flex-direction: column; animation: ap-fade 0.2s ease both; }
+@keyframes ap-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+/* opening the Appointments tab shows the calendar as it is, no fade */
+.ap-root.ap-noanim .view { animation: none; }
+@media (prefers-reduced-motion: reduce) { .ap-root .view { animation: none; } }
+
+/* ===== Shared event colors ===== */
+.ap-root .ev-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--agent-c, var(--wp-blue)); flex: none; }
+
+.ap-root .status-pill {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 999px;
+  background: color-mix(in srgb, var(--st-c, var(--wp-gray)) 16%, transparent);
+  color: color-mix(in srgb, var(--st-c, var(--wp-gray)) 82%, var(--text));
+  flex: none; white-space: nowrap;
+}
+
+/* ============================================================
+   MONTH VIEW
+   ============================================================ */
+.ap-root .month { flex: 1; min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm); }
+.ap-root .month-dow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid var(--line-soft); flex: none; }
+.ap-root .month-dow span { text-align: center; padding: 9px 0 7px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.ap-root .month-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+
+.ap-root .mday {
+  border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);
+  padding: 4px 5px 5px; min-width: 0; display: flex; flex-direction: column; gap: 2px;
+  overflow: hidden; text-align: left; transition: background 0.12s ease; position: relative;
+}
+.ap-root .mday:nth-child(7n) { border-right: 0; }
+@media (hover: hover) { .ap-root .mday:hover { background: var(--hover); } }
+.ap-root .mday.is-out { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.ap-root .mday.is-out .mnum { color: var(--text-3); opacity: 0.55; }
+.ap-root .mday.is-today { background: var(--today-wash); }
+.ap-root .mnum {
+  align-self: center; margin-top: 1px;
+  font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-2);
+  width: 23px; height: 23px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+}
+.ap-root .mday.is-today .mnum { background: var(--wp-blue); color: #fff; font-weight: 700; }
+.ap-root .mday-events { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+
+.ap-root .mev {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11.5px; line-height: 1.3; font-weight: 550;
+  padding: 2px 6px; border-radius: 6px;
+  background: color-mix(in srgb, var(--agent-c, var(--wp-blue)) var(--tint), transparent);
+  color: var(--pill-text-dark);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  width: 100%; text-align: left;
+}
+.ap-root .mev .mev-t { font-weight: 700; font-size: 10.5px; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 70%, var(--text)); flex: none; }
+.ap-root .mev .mev-title { overflow: hidden; text-overflow: ellipsis; }
+.ap-root .mev.is-cancelled { text-decoration: line-through; opacity: 0.55; }
+.ap-root .mmore { font-size: 11px; font-weight: 650; color: var(--text-2); padding: 1px 6px; text-align: left; border-radius: 6px; }
+@media (hover: hover) { .ap-root .mmore:hover { background: var(--hover); } }
+
+.ap-root .mday-dots { display: none; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: 2px; }
+.ap-root .mday-dots i { width: 5.5px; height: 5.5px; border-radius: 50%; background: var(--agent-c, var(--wp-blue)); }
+
+/* ============================================================
+   DAY & WEEK (time grid)
+   ============================================================ */
+.ap-root .timegrid { flex: 1; min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm); }
+.ap-root .tg-allday {
+  display: grid; border-bottom: 1px solid var(--line); flex: none; max-height: 92px; overflow-y: auto;
+}
+.ap-root .tg-head { display: grid; border-bottom: 1px solid var(--line); flex: none; }
+.ap-root .tg-head .tg-corner { border-right: 1px solid var(--line-soft); }
+.ap-root .tg-daycol-head {
+  padding: 7px 6px; text-align: center; border-right: 1px solid var(--line-soft); min-width: 0;
+}
+.ap-root .tg-daycol-head:last-child { border-right: 0; }
+.ap-root .tg-dow { font-size: 11px; font-weight: 650; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-3); }
+.ap-root .tg-dnum {
+  font-size: 20px; font-weight: 650; letter-spacing: -0.02em; margin-top: 2px;
+  width: 34px; height: 34px; line-height: 34px; border-radius: 50%; display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+.ap-root .tg-daycol-head.is-today .tg-dnum { background: var(--wp-blue); color: #fff; }
+.ap-root .tg-daycol-head.is-today .tg-dow { color: var(--wp-blue); }
+
+.ap-root .tg-scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.ap-root .tg-body { display: grid; position: relative; }
+.ap-root .tg-axis { grid-column: 1; }
+.ap-root .tg-hour { height: 52px; position: relative; }
+.ap-root .tg-hour-label {
+  position: absolute; top: -7px; right: 8px; font-size: 10.5px; color: var(--text-3);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.ap-root .tg-col { position: relative; border-right: 1px solid var(--line-soft); }
+.ap-root .tg-col:last-child { border-right: 0; }
+.ap-root .tg-col.is-today { background: var(--today-wash); }
+.ap-root .tg-line { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--line-soft); }
+.ap-root .tg-line.faint { border-top-style: dotted; opacity: 0.6; }
+
+.ap-root .tg-now { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid #e0483d; z-index: 6; pointer-events: none; }
+.ap-root .tg-now::before { content: ""; position: absolute; left: -1px; top: -5px; width: 9px; height: 9px; border-radius: 50%; background: #e0483d; }
+
+.ap-root .tev {
+  position: absolute; left: 3px; right: 3px;
+  border-radius: 7px; padding: 4px 7px; overflow: hidden;
+  background: color-mix(in srgb, var(--agent-c, var(--wp-blue)) var(--tint), var(--surface));
+  border-left: 3px solid var(--agent-c, var(--wp-blue));
+  box-shadow: var(--shadow-sm); cursor: pointer; min-height: 22px;
+  transition: filter 0.12s ease, transform 0.08s ease; z-index: 5;
+}
+@media (hover: hover) { .ap-root .tev:hover { filter: brightness(1.03); z-index: 7; } }
+.ap-root .tev:active { transform: scale(0.995); }
+.ap-root .tev .tev-title { font-size: 12px; font-weight: 650; letter-spacing: -0.01em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap-root .tev .tev-time { font-size: 10.5px; color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap-root .tev .tev-agent { font-size: 10.5px; color: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 74%, var(--text)); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ap-root .tev .tev-agent-inline { color: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 74%, var(--text)); font-weight: 600; }
+.ap-root .tev.is-cancelled .tev-title { text-decoration: line-through; opacity: 0.6; }
+.ap-root .tev.compact { padding: 2px 7px; }
+.ap-root .tev.compact .tev-title { font-size: 11px; }
+
+.ap-root .tg-allday .tg-corner {
+  padding: 6px 8px; font-size: 9.5px; font-weight: 650; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.25; text-align: right;
+  border-right: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: flex-end;
+}
+.ap-root .tg-allday-cell { padding: 5px 5px; border-right: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ap-root .tg-allday-cell:last-child { border-right: 0; }
+.ap-root .allday-chip {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 7px; min-width: 0;
+  background: color-mix(in srgb, var(--agent-c, var(--wp-blue)) var(--tint), transparent);
+  color: var(--pill-text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: filter 0.12s ease;
+}
+@media (hover: hover) { .ap-root .allday-chip:hover { filter: brightness(1.05); } }
+
+/* Day view: all-day events become roomy cards in a responsive grid */
+.ap-root .tg-allday.is-day { max-height: 184px; }
+.ap-root .tg-allday.is-day .tg-allday-cell {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 8px;
+  padding: 10px 12px;
+  align-content: start;
+}
+.ap-root .tg-allday.is-day .allday-chip {
+  align-items: flex-start; text-align: left;
+  padding: 9px 12px; border-radius: 11px; white-space: normal;
+  background: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--agent-c, var(--wp-blue)) 24%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+.ap-root .adc-main { min-width: 0; display: flex; flex-direction: column; flex: 1; }
+.ap-root .adc-title {
+  font-size: 13px; font-weight: 650; letter-spacing: -0.01em; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ap-root .adc-sub {
+  font-size: 11.5px; font-weight: 500; color: var(--text-2); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .ap-root .tg-allday.is-day .tg-allday-cell { grid-template-columns: 1fr; padding: 8px; }
+}
+
+/* ============================================================
+   SCHEDULE VIEW (agenda list)
+   ============================================================ */
+.ap-root .schedule { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 2px; }
+.ap-root .sch-day { display: flex; gap: 16px; padding: 14px 6px; border-bottom: 1px solid var(--line-soft); }
+.ap-root .sch-day:last-child { border-bottom: 0; }
+.ap-root .sch-date { flex: none; width: 92px; text-align: right; padding-top: 2px; position: sticky; top: 0; }
+.ap-root .sch-date .sd-dow { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); }
+.ap-root .sch-date .sd-num { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.ap-root .sch-date .sd-mon { font-size: 11.5px; color: var(--text-3); }
+.ap-root .sch-date.is-today .sd-num { color: var(--wp-blue); }
+.ap-root .sch-items { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+
+.ap-root .sch-ev {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 13px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--agent-c, var(--wp-blue));
+  box-shadow: var(--shadow-sm); text-align: left; width: 100%; cursor: pointer;
+  transition: background 0.12s ease, transform 0.08s ease;
+}
+@media (hover: hover) { .ap-root .sch-ev:hover { background: var(--hover); } }
+.ap-root .sch-ev:active { transform: scale(0.997); }
+.ap-root .sch-time { flex: none; width: 88px; padding-top: 1px; }
+.ap-root .sch-time .st1 { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.ap-root .sch-time .st2 { font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.ap-root .sch-main { flex: 1; min-width: 0; }
+.ap-root .sch-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ap-root .sch-meta { margin-top: 2px; font-size: 12px; color: var(--text-2); display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
+.ap-root .sch-meta .sep { color: var(--text-3); }
+.ap-root .sch-meta .ag { font-weight: 600; color: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 76%, var(--text)); }
+/* light theme: the paler agent colours need more ink to read (≥4.5:1 on
+   white and on their tile tints); the dark theme already clears it */
+:root:not([data-theme="dark"]) .ap-root .sch-meta .ag,
+:root:not([data-theme="dark"]) .ap-root .tev .tev-agent,
+:root:not([data-theme="dark"]) .ap-root .tev .tev-agent-inline,
+:root:not([data-theme="dark"]) .ap-root .mev .mev-t { color: color-mix(in srgb, var(--agent-c, var(--wp-blue)) 45%, var(--text)); }
+.ap-root .sch-notes { margin-top: 3px; font-size: 12px; color: var(--text-3); }
+.ap-root .sch-ev.is-cancelled .sch-title,.ap-root  .sch-ev.is-cancelled .st1 { text-decoration: line-through; opacity: 0.6; }
+
+/* ---------------- Empty / skeleton ---------------- */
+.ap-root .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-3); padding: 40px 20px; }
+.ap-root .empty-emoji { font-size: 34px; margin-bottom: 8px; }
+.ap-root .empty-title { font-size: 15px; font-weight: 650; color: var(--text-2); }
+.ap-root .empty p { margin: 4px 0 0; font-size: 13px; max-width: 320px; }
+
+.ap-root .skeleton-wrap { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 4px; }
+.ap-root .skeleton { border-radius: 12px; background: var(--surface); border: 1px solid var(--line-soft); position: relative; overflow: hidden; }
+.ap-root .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, var(--hover) 50%, transparent 70%); background-size: 220% 100%; animation: ap-shimmer 1.4s infinite; }
+@keyframes ap-shimmer { from { background-position: 150% 0; } to { background-position: -80% 0; } }
+
+/* ============================================================
+   EVENT POPOVER
+   ============================================================ */
+.ap-root #ap-popover-layer { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
+.ap-root .pop-scrim {
+  position: absolute; inset: 0; pointer-events: auto;
+  background: rgba(9, 12, 30, 0.32);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  animation: ap-fadeScrim 0.16s ease both;
+}
+@keyframes ap-fadeScrim { from { opacity: 0; } to { opacity: 1; } }
+
+/* Appointment detail — right-side panel */
+.ap-root .detail-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; pointer-events: auto;
+  width: min(400px, 100vw);
+  background: var(--bg); border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  padding: 20px 22px calc(24px + env(safe-area-inset-bottom));
+  padding-top: calc(20px + env(safe-area-inset-top));
+  padding-right: max(22px, env(safe-area-inset-right));
+  overflow-y: auto;
+  animation: ap-slideIn 0.22s cubic-bezier(0.3, 0.9, 0.35, 1) both;
+}
+@keyframes ap-slideIn { from { transform: translateX(40px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ap-root .detail-panel,.ap-root  .pop-scrim { animation: none; } }
+
+.ap-root .detail-panel .pop-accent { border-radius: 0; height: 4px; }
+/* The ✕ is absolutely positioned, so it needs the safe-area offset itself —
+   otherwise it lands under the iPhone status bar in the installed app
+   (and clear of the notch, with the phone on its side). */
+.ap-root .detail-panel .pop-close { top: calc(10px + env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right)); }
+.ap-root .detail-panel .pop-title { font-size: 19px; margin-top: 8px; line-height: 1.3; }
+.ap-root .detail-panel .pop-row { font-size: 13.5px; margin-top: 12px; }
+.ap-root .detail-body { margin-top: 4px; }
+
+/* Thumb-reachable Close bar pinned to the bottom of detail panels on phones —
+   the top-right ✕ is out of one-handed reach there. */
+.ap-root .dp-close-bar { display: none; }
+.ap-root .settings-close-mobile { display: none; }
+@media (max-width: 640px) { .ap-root .settings-close-mobile { display: inline-block; } }
+@media (max-width: 640px) {
+  .ap-root .detail-panel { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+  .ap-root .detail-panel .icon-btn.pop-close { width: 38px; height: 38px; background: var(--surface-2); }
+  .ap-root .dp-close-bar {
+    display: block; position: fixed; left: 14px; right: 14px;
+    bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 5;
+  }
+  .ap-root .dp-close-bar button {
+    width: 100%; padding: 14px; border-radius: 999px;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--line); box-shadow: var(--shadow-lg);
+    font-size: 15px; font-weight: 650; letter-spacing: -0.01em;
+  }
+  .ap-root .dp-close-bar button:active { transform: scale(0.98); }
+}
+
+.ap-root .pop-title.is-payout-title {
+  background: linear-gradient(90deg, #D4A017, var(--wp-green));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ap-root .detail-link { color: var(--wp-blue); font-weight: 600; text-decoration: none; word-break: break-word; }
+@media (hover: hover) { .ap-root .detail-link:hover { text-decoration: underline; } }
+
+.ap-root .detail-sec {
+  margin-top: 20px; padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.ap-root .detail-extra { margin: 6px 0 0; }
+.ap-root .detail-extra > div {
+  display: flex; gap: 12px; align-items: baseline;
+  padding: 7px 0; border-bottom: 1px solid var(--line-soft);
+}
+.ap-root .detail-extra > div:last-child { border-bottom: 0; }
+.ap-root .detail-extra dt {
+  flex: none; width: 118px;
+  font-size: 12px; font-weight: 650; color: var(--text-3);
+}
+.ap-root .detail-extra dd { margin: 0; font-size: 13px; color: var(--text); min-width: 0; word-break: break-word; }
+
+/* Legacy anchored popover base (kept for shared row/close styles) */
+@keyframes ap-popIn { from { opacity: 0; transform: scale(0.97) translateY(4px); } to { opacity: 1; transform: none; } }
+.ap-root .pop-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--agent-c, var(--wp-blue)); }
+.ap-root .pop-close { position: absolute; top: 10px; right: 10px; }
+.ap-root .pop-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin: 4px 44px 8px 0; }
+.ap-root .pop-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 9px; font-size: 13px; color: var(--text-2); }
+.ap-root .pop-row .pic { width: 17px; height: 17px; flex: none; color: var(--text-3); margin-top: 1px; }
+.ap-root .pop-row b { color: var(--text); font-weight: 600; }
+
+/* ============================================================
+   Modals
+   ============================================================ */
+.ap-root .backdrop {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(9, 12, 30, 0.46);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: ap-fadeIn 0.16s ease both;
+}
+@keyframes ap-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 641px) { .ap-root .backdrop { align-items: center; padding: 24px; } }
+
+.ap-root .modal {
+  width: 100%; max-width: 470px; background: var(--bg);
+  border: 1px solid var(--line); border-radius: 22px 22px 0 0;
+  box-shadow: var(--shadow-lg); padding: 20px 22px calc(22px + env(safe-area-inset-bottom));
+  animation: ap-sheetUp 0.22s cubic-bezier(0.32, 0.9, 0.35, 1) both;
+  max-height: 90dvh; overflow-y: auto;
+}
+@media (min-width: 641px) { .ap-root .modal { border-radius: 22px; padding-bottom: 22px; } }
+@keyframes ap-sheetUp { from { transform: translateY(22px); opacity: 0.5; } to { transform: none; opacity: 1; } }
+
+.ap-root .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ap-root .modal-head h2 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
+
+.ap-root .field-label { display: block; font-size: 12.5px; font-weight: 650; color: var(--text-2); margin-bottom: 6px; }
+.ap-root .field {
+  width: 100%; padding: 11px 13px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text); font-size: 13.5px; outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ap-root .field:focus { border-color: color-mix(in srgb, var(--wp-blue) 55%, transparent); box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--wp-blue) 14%, transparent); }
+.ap-root .field-hint { font-size: 12px; color: var(--text-3); margin: 8px 0 4px; line-height: 1.5; }
+.ap-root .field-hint code { font-size: 11px; background: var(--hover); padding: 1px 5px; border-radius: 5px; }
+
+.ap-root .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 0; border-top: 1px solid var(--line-soft); margin-top: 12px; }
+.ap-root .settings-row-title { font-size: 14px; font-weight: 650; letter-spacing: -0.01em; }
+.ap-root .settings-row-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+
+.ap-root .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); gap: 2px; }
+.ap-root .seg-btn { padding: 5px 11px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: var(--text-2); transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
+.ap-root .seg-btn.is-active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+.ap-root .switch { width: 46px; height: 28px; border-radius: 999px; background: color-mix(in srgb, var(--text) 16%, transparent); position: relative; transition: background 0.18s ease; flex: none; }
+.ap-root .switch .knob { position: absolute; top: 2.5px; left: 2.5px; width: 23px; height: 23px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.18s cubic-bezier(0.3,0.9,0.4,1.2); }
+.ap-root .switch[aria-checked="true"] { background: var(--wp-green); }
+.ap-root .switch[aria-checked="true"] .knob { transform: translateX(18px); }
+
+.ap-root .modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.ap-root .settings-status { font-size: 12.5px; color: var(--text-3); flex: 1; }
+/* 💰 payout milestone events — golden, celebratory but subtle */
+.ap-root .mev.is-payout,.ap-root 
+.allday-chip.is-payout,.ap-root 
+.sch-ev.is-payout {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, #D4A017 16%, transparent),
+    color-mix(in srgb, #2EB875 10%, transparent));
+  border: 1px solid color-mix(in srgb, #D4A017 38%, transparent);
+}
+.ap-root .mev.is-payout .mev-title,.ap-root 
+.sch-ev.is-payout .sch-title { font-weight: 700; }
+
+.ap-root .conn-status {
+  margin: 12px 0 0; padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 11.5px; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.ap-root .settings-status.ok { color: var(--wp-green); font-weight: 650; }
+.ap-root .settings-status.err { color: #d9544f; font-weight: 650; }
+
+.ap-root .primary-btn {
+  padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; letter-spacing: -0.01em;
+  color: #fff; background: linear-gradient(135deg, var(--wp-blue), var(--wp-green));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--wp-blue) 30%, transparent);
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+@media (hover: hover) { .ap-root .primary-btn:hover { filter: brightness(1.06); } }
+.ap-root .primary-btn:active { transform: scale(0.97); }
+.ap-root .primary-btn:disabled { opacity: 0.55; cursor: default; }
+
+.ap-root .sc-list { margin: 0; display: grid; grid-template-columns: 1fr; gap: 2px; }
+.ap-root .sc-list > div { display: flex; align-items: center; gap: 14px; padding: 7px 4px; border-bottom: 1px solid var(--line-soft); }
+.ap-root .sc-list > div:last-child { border-bottom: 0; }
+.ap-root .sc-list dt { margin: 0; flex: none; width: 92px; display: flex; gap: 5px; }
+.ap-root .sc-list dd { margin: 0; font-size: 13px; color: var(--text-2); }
+.ap-root kbd { display: inline-block; min-width: 20px; text-align: center; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); font-family: var(--font); font-size: 11.5px; font-weight: 650; color: var(--text); box-shadow: 0 1px 0 var(--line); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 1000px) {
+  .ap-root .search-wrap { width: 180px; }
+  .ap-root .search-wrap:focus-within { width: 200px; }
+}
+/* (the 16px touch text needs a little more room for "Search appointments") */
+@media (max-width: 1000px) and (pointer: coarse) {
+  .ap-root .search-wrap { width: 204px; }
+  .ap-root .search-wrap:focus-within { width: 220px; }
+}
+
+@media (max-width: 860px) {
+  .ap-root .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 46;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    /* (a phone on its side: wider by the notch's inset, its content clear of it) */
+    width: calc(280px + env(safe-area-inset-left)); padding-left: calc(12px + env(safe-area-inset-left));
+    transform: translateX(-100%); transition: transform 0.24s cubic-bezier(0.32,0.9,0.35,1);
+    box-shadow: var(--shadow-lg);
+  }
+  .ap-root .sidebar.open { transform: none; }
+  .ap-root .search-wrap { display: none; }
+  .ap-root .viewswitch { display: none; }
+}
+
+@media (min-width: 861px) {
+  .ap-root #ap-btn-menu { display: none; }
+  .ap-root .sidebar-scrim { display: none !important; }
+}
+
+@media (max-width: 560px) {
+  /* Compact month: dots instead of chips */
+  .ap-root .mev,.ap-root  .mmore { display: none; }
+  .ap-root .mday { align-items: center; padding: 4px 2px; }
+  .ap-root .mday-dots { display: flex; }
+  .ap-root .mday-events { display: none; }
+  .ap-root .sch-date { width: 62px; }
+  .ap-root .sch-time { width: 72px; }
+  /* the location wraps under the agent here: no "·" left hanging at a line end */
+  .ap-root .sch-meta { column-gap: 10px; }
+  .ap-root .sch-meta .sep { display: none; }
+}
+
+/* Bottom view switcher on phones */
+.ap-root .bottom-nav { display: none; }
+@media (max-width: 860px) {
+  .ap-root .bottom-nav {
+    display: flex; flex: none;
+    border-top: 1px solid var(--line); background: var(--appbar-bg);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 30;
+  }
+  .ap-root .bn-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 8px 0 7px; font-size: 10.5px; font-weight: 600; color: var(--text-3);
+  }
+  .ap-root .bn-btn .ic { width: 20px; height: 20px; }
+  .ap-root .bn-btn.is-active { color: var(--wp-blue); }
+}
+
+
+/* ============================================================
+   Mobile polish
+   ============================================================ */
+@media (max-width: 640px) {
+  /* One clean appbar row on phones: the wordmark moves into the drawer,
+     the theme switch lives in Settings, and the date label gets the room. */
+  .ap-root .appbar {
+    height: 54px;
+    gap: 2px;
+    padding: 0 6px 0 4px;
+  }
+  .ap-root .brand { display: none; }
+  .ap-root #ap-btn-theme { display: none; }
+  .ap-root .icon-btn { width: 38px; height: 38px; }
+  .ap-root .icon-btn.small { width: 32px; height: 32px; }
+  .ap-root .ghost-btn { margin-left: 2px; padding: 6px 12px; font-size: 12.5px; }
+  .ap-root .datenav { margin-left: 0; }
+  .ap-root .appbar-right { gap: 0; }
+  .ap-root .current-label { font-size: 17px; margin-left: 6px; }
+  .ap-root .tg-dnum { font-size: 17px; width: 30px; height: 30px; line-height: 30px; }
+}
+
+/* Branding header inside the drawer (phones/tablets — the appbar drops it) */
+.ap-root .sidebar-brand { display: none; }
+@media (max-width: 860px) {
+  .ap-root .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 2px 6px 14px; margin-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ap-root .sidebar-brand .brand-logo-img { height: 26px; }
+  .ap-root .sidebar-brand-team {
+    font-size: 13px; font-weight: 650; letter-spacing: -0.01em;
+    color: var(--text-2); white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   Ice Kannon Route integration (everything above is the calendar's own
+   stylesheet, scoped to .ap-root; ids carry an ap- prefix)
+   ============================================================ */
+/* the site's palette, so the calendar reads as part of the same app */
+.ap-root {
+  --appbar-bg: #F6F8FB;
+  --text: #152047; --text-2: #57627C; --text-3: #687086;
+  --line: #E4E9F1;
+}
+:root[data-theme="dark"] .ap-root {
+  --bg: #0D1120; --canvas: #111629; --surface: #161B2E; --surface-2: #1B2136; --rail: #0F1323;
+  --appbar-bg: #0D1120;
+  --text: #EDF0F8; --text-2: #A3ACC4; --text-3: #8E97B0;
+  --line: #252C44; --line-soft: #1E2439; --hairline: #20263B;
+}
+.ap-root .sidebar-brand .brand-logo-img { width: auto; }
+
+/* Day / Week / Month / Schedule on phones and tablets: a segmented row under
+   the app bar (the site's tab bar owns the bottom of the screen) */
+@media (max-width: 860px) {
+  .ap-root .bottom-nav {
+    display: flex; flex: none; gap: 4px;
+    padding: 6px max(10px, env(safe-area-inset-right)) 7px max(10px, env(safe-area-inset-left));
+    background: var(--appbar-bg); border-top: 0; border-bottom: 1px solid var(--line);
+    z-index: 30;
+  }
+  .ap-root .bn-btn {
+    flex: 1; flex-direction: row; justify-content: center; gap: 6px;
+    padding: 7px 0; border-radius: 9px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: -0.005em; color: var(--text-2);
+    transition: color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .ap-root .bn-btn .ic { width: 16px; height: 16px; }
+  .ap-root .bn-btn.is-active { color: var(--wp-blue); box-shadow: inset 0 0 0 1.5px var(--wp-blue); }
+  .ap-root .sidebar { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+}
+/* clear of the notch and the rounded corners (a phone on its side) */
+.ap-root .appbar {
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+@media (max-width: 640px) {
+  .ap-root .appbar {
+    padding-left: max(4px, env(safe-area-inset-left));
+    padding-right: max(6px, env(safe-area-inset-right));
+  }
+}
+.ap-root .content {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+/* (a big phone on its side keeps the sidebar in the page: the inset goes on
+   the sidebar, at the screen's edge, not between it and the calendar) */
+@media (min-width: 860.02px) {
+  .ap-root .sidebar { width: calc(256px + env(safe-area-inset-left)); padding-left: calc(12px + env(safe-area-inset-left)); }
+  .ap-root .content { padding-left: 0; }
+}
+
+/* phone landscape: short screens keep the hour grid — the view switch goes
+   back into the app bar (as on wider screens) instead of its own row */
+@media (max-width: 860px) and (max-height: 500px) {
+  .ap-root .bottom-nav { display: none; }
+  .ap-root .viewswitch { display: inline-flex; margin-left: 2px; }
+  .ap-root .vs-btn { padding: 6px 9px; }
+}
+
+/* a phone turned sideways: a slimmer bar under the (slimmer) site header,
+   so the hours keep their room */
+@media (max-width: 999.98px) and (max-height: 500px) {
+  .ap-root .appbar { height: 46px; gap: 2px; }
+  /* tighter spacing, as on a phone upright, so the date keeps its room
+     inside the notch's insets */
+  .ap-root .appbar > .ghost-btn { margin-left: 2px; }
+  .ap-root .datenav,.ap-root .viewswitch { margin-left: 0; }
+  .ap-root .viewswitch { padding: 2px; }
+  .ap-root .current-label { margin-left: 4px; }
+  .ap-root .appbar-right { gap: 0; }
+  .ap-root .banner { margin-top: 8px; padding: 7px 13px; flex-wrap: nowrap; }
+  /* one line: the message gives way (…) to its buttons */
+  .ap-root .banner > span { min-width: 0; flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ap-root .banner > .link-btn { flex: none; white-space: nowrap; }
+  /* the glance breakdown (narrowed by the insets) stacks agent and place */
+  .ap-root .detail-panel .sch-meta { column-gap: 10px; }
+  .ap-root .detail-panel .sch-meta .sep { display: none; }
+  .ap-root .view-host { padding-top: 8px; padding-bottom: 8px; }
+  /* Day / Week: one slim row of dates (Day has none: the app bar says it)
+     and a capped all-day row, so a few hours of the grid show */
+  .ap-root .tg-daycol-head { padding: 3px 4px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .ap-root .tg-dnum { font-size: 15px; width: 26px; height: 26px; line-height: 26px; margin: 0; }
+  .ap-root .tg-allday,.ap-root .tg-allday.is-day { max-height: 44px; }
+  .ap-root .tg-allday.is-day .tg-allday-cell { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); padding: 4px 8px; }
+  .ap-root .tg-allday.is-day .allday-chip { padding: 4px 10px; }
+  .ap-root .tg-allday.is-day .adc-sub { display: none; }
+  /* Month: the rows are too short for chips — a row of dots beside the date */
+  .ap-root .mev,.ap-root .mmore,.ap-root .mday-events { display: none; }
+  .ap-root .mday { flex-direction: row; align-items: center; justify-content: center; gap: 4px; padding: 1px 2px; }
+  .ap-root .mnum { width: 20px; height: 20px; margin: 0; align-self: center; }
+  .ap-root .mday-dots { display: flex; flex-wrap: nowrap; margin: 0; }
+}
+
+/* Your Calendly (Settings): this person's own, above the team's feed */
+.ap-root .cal-set { padding: 0 0 16px; margin-bottom: 16px; border-bottom: 1px solid var(--line-soft); }
+.ap-root .cal-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.ap-root .cal-dot { width: 12px; height: 12px; border-radius: 4px; background: #7B61FF; flex: none; margin-top: 4px; }
+.ap-root .cal-row { display: flex; gap: 8px; align-items: stretch; }
+.ap-root .cal-row .field { flex: 1; min-width: 0; }
+/* shown as dots, but not a password field (a browser mustn't offer to save it as one) */
+.ap-root .cal-token { -webkit-text-security: disc; }
+.ap-root .cal-token::placeholder { -webkit-text-security: none; }
+.ap-root .cal-row .primary-btn { flex: none; }
+.ap-root .cal-on { display: flex; gap: 8px; flex-wrap: wrap; }
+.ap-root .cal-on .ghost-btn { margin-left: 0; }
+.ap-root .cal-on[hidden],.ap-root #ap-cal-connect[hidden] { display: none; }
+.ap-root .cal-status { margin: 10px 0 0; }
+.ap-root .cal-status:empty { display: none; }
+.ap-root .pop-cal { color: color-mix(in srgb, #7B61FF 78%, var(--text)); }
+
+/* its part of the site's Settings: the same fields, in the Settings card (the
+   theme has its own place there, and Settings has its own close button) */
+.set-mod.ap-root.ap-set {
+  height: auto; overflow: visible; display: block; background: var(--bg);
+  font-size: 14px; padding: 14px 14px 10px;
+}
+.ap-set .ap-theme-row,.ap-set  .settings-close-mobile { display: none; }
+.ap-set .modal-actions { margin-top: 14px; }
+
+/* ---------------- Hand-entered appointments, meetings and events ---------------- */
+/* the + (over the calendar, clear of the site's tab bar, which ends where the content does) */
+.ap-root .content { position: relative; }
+.ap-root .fab {
+  position: absolute; right: max(16px, env(safe-area-inset-right)); bottom: 16px; z-index: 20;
+  width: 52px; height: 52px; border-radius: 16px; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--wp-blue), var(--wp-green));
+  box-shadow: 0 6px 18px -6px rgba(21, 32, 71, 0.45), 0 2px 4px rgba(21, 32, 71, 0.18);
+}
+.ap-root .fab .ic { width: 24px; height: 24px; }
+.ap-root .fab:active { transform: scale(0.96); }
+@media (max-width: 999.98px) and (max-height: 500px) { .ap-root .fab { width: 44px; height: 44px; border-radius: 14px; bottom: 10px; } }
+.ap-root .schedule { padding-bottom: 76px; }
+@media (hover: hover) { .ap-root .tg-col.can-add { cursor: cell; } }
+/* the mark on an entry added in the calendar */
+.ap-root .man-ic { display: inline-flex; width: 11px; height: 11px; margin-right: 4px; flex: none; vertical-align: -1px; opacity: 0.75; }
+.ap-root .man-ic svg { width: 11px; height: 11px; display: block; }
+.ap-root .man-pill { --st-c: #1E8FE8; margin-left: 6px; }
+.ap-root .pop-man { display: flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--text-2); margin: -4px 0 10px; }
+.ap-root .dp-actions { display: flex; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ap-root .dp-actions .ghost-btn { margin-left: 0; }
+.ap-root .ev-del { color: #d9544f; }
+/* the editor */
+.ap-root .ev-modal .field { margin-bottom: 12px; }
+.ap-root .ev-modal textarea.field { resize: vertical; min-height: 72px; font-family: inherit; }
+.ap-root .ev-kinds { display: flex; margin-bottom: 14px; }
+.ap-root .ev-kinds .seg-btn { flex: 1; }
+.ap-root .ev-when { display: flex; align-items: flex-end; gap: 14px; }
+.ap-root .ev-when .ev-date { flex: 1; min-width: 0; }
+.ap-root .ev-allday { display: flex; flex-direction: column; align-items: flex-start; padding-bottom: 14px; }
+.ap-root .ev-times { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ap-root .ev-modal .modal-actions { flex-wrap: wrap; }
+.ap-root .ev-modal .modal-actions .settings-status { flex: 1 1 100%; order: -1; }
+/* 16px on touch screens, so iOS doesn't zoom in on a field (an installed
+   app has no way to zoom back out) */
+@media (pointer: coarse) { .ap-root .field, .ap-root .search-input { font-size: 16px; } }
+
+/* touch screens: finger-sized controls (38–40px, like the rest of the site);
+   links keep their look and get the room from padding */
+@media (pointer: coarse) {
+  .ap-root .ghost-btn,.ap-root .primary-btn { min-height: 40px; }
+  .ap-root .seg-btn,.ap-root .bn-btn,.ap-root .vs-btn { min-height: 38px; }
+  .ap-root .icon-btn.small,.ap-root .mini-nav .icon-btn.small { width: 38px; height: 38px; }
+  .ap-root .link-btn { padding: 13px 6px; margin: -13px -6px; }
+  .ap-root .detail-link { display: inline-block; padding: 10px 0; margin: -10px 0; }
+  .ap-root .switch::before { content: ""; position: absolute; inset: -8px; }
+}
+/* (the phone's bar keeps the room its date had before ‹ › grew) */
+@media (pointer: coarse) and (max-width: 640px) { .ap-root .appbar { gap: 0; } }
+
+/* before iOS 26 a home-screen app's status bar text is always white: the
+   panels that cover the site's header (the drawer on phones and tablets, the
+   details) keep its dark strip under it, as the header does */
+@supports not (anchor-name: --a) {
+  .ap-root .detail-panel { background-image: linear-gradient(var(--sbar, #0D1120) 0 env(safe-area-inset-top, 0px), transparent 0); }
+  @media (max-width: 860px) {
+    .ap-root .sidebar { background-image: linear-gradient(var(--sbar, #0D1120) 0 env(safe-area-inset-top, 0px), transparent 0); }
+  }
+}
+/* Settings → the Calendly chip: lands just under the sticky header and chips */
+.ap-set .cal-set { scroll-margin-top: calc(var(--settop, 52px) + 60px); }
+
+/* In Ice Kannon Route the calendar's settings are in the site's Settings (the gear
+   in the header, which opened from here too), so the calendar's toolbar has
+   no gear of its own — one Settings, one gear */
+.ap-root #ap-btn-settings { display: none; }

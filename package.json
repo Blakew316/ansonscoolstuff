@@ -1,0 +1,16 @@
+{
+  "name": "ice-kannon-route",
+  "private": true,
+  "description": "Ice Kannon Route — routes, appointments, statements and AppUpload in one site. Dependencies here are for the Netlify functions only; the site itself is copied as-is into _site (netlify/publish.mjs).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@netlify/blobs": "^11.1.1",
+    "@supabase/supabase-js": "^2.117.2",
+    "exceljs": "^4.4.0",
+    "pdf-lib": "^1.17.1"
+  }
+}

@@ -1,0 +1,79 @@
+# The site is served from _site, which holds everything except the server's
+# own files (see netlify/publish.mjs); the functions are bundled from the repo.
+[build]
+  command = "node netlify/publish.mjs"
+  publish = "_site"
+
+[functions]
+  directory = "netlify/functions"
+
+# Static assets change rarely; give a changed file a new name rather than
+# overwrite it, since phones may keep a copy for up to a week.
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/apps/appupload/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# AppUpload's backdrop videos and still: unchanged files, kept for a week
+# (as AppUpload's own server does), so each lap replays from the cache
+[[headers]]
+  for = "/videos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/backdrop.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/backdrop.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# A way past any saved copy to the team's Netlify login, then into the app:
+# no version of the service worker answers /sign-in, so it always reaches
+# the network (the app's "Sign in" button uses it; it also rescues a browser
+# still running an older version whose login ran out).
+[[redirects]]
+  from = "/sign-in"
+  to = "/"
+  status = 302
+  force = true
+
+# Server-only files — the functions' code and AppUpload's form templates —
+# and installed packages are never served as pages (they aren't in _site
+# either; this is a second guard).
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/node_modules/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
