@@ -1,20 +1,16 @@
-/* Shared by the AppUpload functions: who is calling (a signed-in company
-   account whose mailbox is confirmed, checked with Supabase), JSON replies, and the short-lived job
+/* Shared by the site's functions: who is calling (only the site itself —
+   there are no accounts), JSON replies, and AppUpload's short-lived job
    store. Photos and read-back data live there only while a job runs: photos
    are deleted as soon as they've been read, results as soon as they're
    collected, and anything left over within the hour (au-cleanup, every 15
    minutes, removes jobs older than 40 minutes). */
 import { getStore } from "@netlify/blobs";
 
-/* the same public project URL + publishable key the app itself uses */
-export const SB_URL = "https://xeevmevxjuawskugedds.supabase.co";
-export const SB_KEY = "sb_publishable_hYOu-5EyUkMyJ64UNBTnwQ_4ehY5Roc";
-const COMPANY = /@wholesalepayments\.com$/i;
 
 /* a one-person site: there's no sign-in, and the page sends OWNER_TOKEN as
    its owner. Anyone with the site's address can use these functions, so the
    per-person hourly limits are the site's limits. (OWNER_MODE=0 in the
-   Netlify environment turns it off.) */
+   Netlify environment switches the functions off.) */
 export const OWNER_MODE = process.env.OWNER_MODE !== "0";
 export const OWNER_TOKEN = "ice-kannon-personal-site";
 const OWNER = { id: "owner", email: "owner", confirmed: true, owner: true };
@@ -33,43 +29,10 @@ export const json = (o, status = 200) =>
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
 
-/* the Supabase user behind the bearer token, remembered for a few minutes per token */
-const USERS = new Map();
-async function caller(req) {
-  const m = /^Bearer\s+(\S{20,4096})$/i.exec(req.headers.get("authorization") || "");
-  if (!m) return { status: 401 };
-  const token = m[1];
-  const hit = USERS.get(token);
-  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return hit.user;
-  let r;
-  try {
-    r = await fetch(SB_URL + "/auth/v1/user", {
-      headers: { apikey: SB_KEY, authorization: "Bearer " + token },
-      signal: AbortSignal.timeout(4000),
-    });
-  } catch (e) { return { status: 503 }; }
-  if (r.status === 401 || r.status === 403) return { status: 401 };
-  if (!r.ok) return { status: 503 };
-  let u = null;
-  try { u = await r.json(); } catch (e) {}
-  const email = String((u && u.email) || ""), id = String((u && u.id) || "");
-  if (!email || !id) return { status: 401 };
-  if (USERS.size > 200) USERS.clear();
-  /* a proven mailbox: Supabase stamps this once the confirmation link is opened */
-  const user = { id, email, confirmed: !!(u.email_confirmed_at || u.confirmed_at) };
-  USERS.set(token, { at: Date.now(), user });
-  return user;
-}
-
-/* { user, token } for a signed-in company account, otherwise { res } to send back */
+/* { user } for the site itself, otherwise { res } to send back */
 export async function requireUser(req) {
-  if (isOwner(req)) return { user: OWNER, token: "" };
-  const who = await caller(req);
-  if (who.status === 503) return { res: json({ error: "Couldn’t confirm your sign-in — try again in a minute." }, 503) };
-  if (!who.email) return { res: json({ error: "Your sign-in has expired — sign out and back in, then try again." }, 401) };
-  if (!COMPANY.test(who.email)) return { res: json({ error: "This email address isn’t authorized." }, 403) };
-  if (!who.confirmed) return { res: json({ error: "Confirm your email address first — open the link we sent to your inbox, then try again." }, 403) };
-  return { user: who, token: /^Bearer\s+(\S+)$/i.exec(req.headers.get("authorization") || "")[1] };
+  if (isOwner(req)) return { user: OWNER };
+  return { res: json({ error: "This site’s server only answers the site itself." }, 401) };
 }
 
 export const jobStore = () => getStore({ name: "appupload-jobs", consistency: "strong" });

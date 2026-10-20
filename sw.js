@@ -1,7 +1,7 @@
 /* Ice Kannon Route — offline service worker. Keeps the app shell and every
    section (Routes, Appointments, AppUpload) on the device so the
-   app opens instantly and works offline; team data always comes from
-   Supabase directly, and the site's functions are never cached here. */
+   app opens instantly and works offline; the site's functions are never
+   cached here. */
 const VER = "wp-routes-v50";         /* the same as APP_VER in index.html */
 /* every deploy's own fingerprint, written in by netlify/publish.mjs (so any
    change to the site is a new service worker, and open apps update) */
@@ -15,7 +15,6 @@ const CORE = [
   "./",
   "manifest.webmanifest",
   "manifest-dark.webmanifest",
-  "vendor/supabase.js",
   "img/logo-light.webp",
   "img/logo-dark.webp",
   "img/pdf-logo.jpg",
@@ -25,7 +24,7 @@ const CORE = [
   "icons/ice-kannon-v2-512.png",
   "icons/ice-kannon-v2-mask-512.png",
 ];
-const CRITICAL = ["./", "manifest.webmanifest", "manifest-dark.webmanifest", "vendor/supabase.js",
+const CRITICAL = ["./", "manifest.webmanifest", "manifest-dark.webmanifest",
   "img/logo-light.webp", "img/logo-dark.webp"];
 /* the other sections, saved up front as the stand-alone calendar did */
 const MODULE_FILES = [
@@ -87,8 +86,8 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
-  /* never intercept API traffic or other origins (Supabase, fonts) — caching
-     those would serve stale team data and stale prospect lists */
+  /* never intercept API traffic or other origins (fonts) — caching
+     those would serve stale prospect lists */
   if (url.origin !== location.origin) return;
   if (url.pathname.includes("/.netlify/functions/")) return;
   /* videos stream straight from the network, never into the device's cache */
@@ -148,7 +147,7 @@ self.addEventListener("fetch", e => {
     return;
   }
 
-  /* everything else (images, icons, the supabase library): cache first,
+  /* everything else (images, icons): cache first,
      refreshed in the background */
   const hit = caches.match(req);
   const net = fetch(req).then(async r => {

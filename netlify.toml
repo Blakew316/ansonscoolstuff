@@ -20,11 +20,6 @@
     Cache-Control = "public, max-age=604800"
 
 [[headers]]
-  for = "/vendor/*"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-
-[[headers]]
   for = "/apps/appupload/vendor/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"

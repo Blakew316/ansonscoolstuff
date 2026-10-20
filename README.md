@@ -1,7 +1,7 @@
 # Ice Kannon Route
 
 Team Ice Kannon's copy of the Wholesale Payments field site (forked from
-agentroute, without the Statements generator), behind the company sign-in:
+agentroute, without the Statements generator), with no sign-in:
 
 - **Routes** — a team field-route planner: managers build ZIP- or
   city-based merchant routes for their reps and watch notes roll in live.
@@ -82,15 +82,16 @@ name.
 This copy is one person's site: there's no sign-in screen. It opens straight
 onto its own team, **Team Ice Kannon**, which is kept on the device (and
 works offline) — routes, notes, agents and calendar entries aren't synced to
-the team database, so another phone or browser starts empty. Settings → Team
-shows the team name only (no join code, team switching, password or sign-out).
-The code that signs in and syncs is still in `index.html` behind `PERSONAL`.
+a database, so another phone or browser starts empty. Settings → Team shows
+the team name only (no join code, team switching, password or sign-out). The
+site has no database or accounts of its own and isn't connected to
+agentroute's: the old sign-in and sync code in `index.html` sits unused
+behind `PERSONAL`, with no project address or key.
 
 The site's functions (Auto-generate, AppUpload's reader and forms,
-Calendly) still check who is
-calling: the page calls them as the site's owner, with no sign-in
-(`netlify/au/common.mjs`; `OWNER_MODE=0` in the Netlify environment variables
-turns that off). That means anyone who has the site's address can
+Calendly) answer only the site itself: the page calls them as the site's
+owner (`netlify/au/common.mjs`; `OWNER_MODE=0` in the Netlify environment
+variables switches them off). That means anyone who has the site's address can
 use them — the Google Places and Claude keys bill to you — so keep the
 address private (or turn on
 Netlify's site password). The per-person hourly limits (30 Auto-generate
@@ -99,28 +100,10 @@ AppUpload's past submissions are saved in the browser in this mode.
 
 ## Your settings
 
-A person's own choices are kept with their account, so they come back after
-signing out and appear on any phone or computer they sign in on: Appearance,
-which team opens, which agent (and day) Routes opens on, the auto-generate
-"Max reviews" cap, the calendar's hidden agents (My Calendly included) and
-default agent for new entries, AppUpload's sales rep and territory
-manager. They're kept by the
-`me-prefs` function in Netlify Blobs (store `prefs`) under that person's
-sign-in only: nobody else can read or change them, and only these named
-settings are accepted.
-
-The browser keeps the working copy. The device's record of what the account
-last had (`wp.prefmeta`) tells the person's own changes apart from anything
-else: a change goes up within seconds (when a phone was offline, once it's
-back); signing in, or opening the app, brings in what changed elsewhere, and
-a change made from an older copy never overwrites a newer one. Nothing goes
-up from a device before it has first brought in the account's settings, and
-another tab signing out never counts as clearing them. Signing out sends
-what's pending first; if that can't happen (no connection) it says so, and
-keeps those changes for the same person's next sign-in here. The team's own
-data (routes, agents, calendar entries, the feeds) is on the team's database,
-and Calendly's connection on the server. Left per device on purpose: a setup
-link's feed override, demo data, the last section open.
+Everything — Appearance, which agent (and day) Routes opens on, the
+auto-generate "Max reviews" cap, the calendar's hidden agents and default
+agent, AppUpload's sales rep — is kept in the browser on this device.
+Calendly's connection is kept on the site's server (Netlify Blobs).
 
 ## Building routes
 
@@ -145,9 +128,8 @@ contact info, and route tools:
   email / owner name from each business's website, and builds the agent's
   **full 6-day route with up to 25 merchants per day**, checkpoints every
   5 stops. Requires `GOOGLE_PLACES_API_KEY` in Netlify environment
-  variables (Places API (New), billing enabled). The function only runs
-  for a signed-in company account with a confirmed mailbox, and each
-  person can run up to 30 new searches an hour (150 a day; repeating a
+  variables (Places API (New), billing enabled). The function only answers
+  the site itself, and the site can run up to 30 new searches an hour (150 a day; repeating a
   search from the last 10 minutes is free), since every search bills
   Places requests; a daily quota cap on the key in Google Cloud is still a
   good idea.
@@ -213,14 +195,11 @@ The **+** button (bottom right of the calendar, or tap an empty slot in the
 day / week view, or press C) adds an appointment, meeting or event by hand
 — title, who it's for (an agent or the whole team), date, all-day or start
 and end times, location, phone, notes — with no feed or script involved.
-Entries are saved with the team's data in Supabase (the `events` key of
-`wp_team_state`), so they show on every teammate's calendar within
-seconds, work offline and merge back like route edits; tap one to edit or
+Entries are saved on this device with the rest of the team's data, and
+work offline; tap one to edit or
 delete it (with Undo). A team can have up to 1,000 upcoming entries; past
 ones don't count, and once 3,000 are stored the ones dated furthest back
-make room. A database trigger (`wp_team_state_keep_keys`)
-keeps these entries and the team's settings when a device still running
-an older version saves.
+make room.
 
 **Your Calendly.** Anyone can put their own Calendly events (interviews,
 calls) on their calendar: in Calendly, Integrations → API & Webhooks → Get
@@ -259,8 +238,7 @@ and so does a different person signing in on the same device.
 
 The AppUpload app (myappupload.com — the appupload repo's main branch) as a
 section: the same page, video backdrop, review form and documents, running
-in this site against its own functions. Everything needs a signed-in company
-account (the stand-alone app's API has no sign-in at all). One part is drawn
+in this site against its own functions. One part is drawn
 differently: Past uploads & downloads, on the same see-through glass as the
 cards above it, is a list of rows with the business, its form, rep and
 time, and round Download and Remove buttons — working exactly as the
@@ -322,11 +300,8 @@ original's.
   for one document per request and puts a multi-document packet together
   itself with the same PDF library, so every request stays inside Netlify's
   time and size limits. The Clover spreadsheet comes from `au-menu-xlsx`.
-- **Submission history** — the same shared table AppUpload uses
-  (`public.app_submissions` in this Supabase project), read and written as
-  the signed-in person through `au-history`; row-level security lets only
-  confirmed company accounts in (no service key on the site). Saved
-  submissions show up in both places.
+- **Submission history** — saved in this browser (`au-history` serves
+  nothing here).
 - **Equipment** — `au-equipment` (the pricing matrix models for the purchase order).
 - **Backdrop** — the rotating clips live in `videos/` (`backdrop.mp4` and
   `backdrop.png` at the root), cached for a week. They play only while they

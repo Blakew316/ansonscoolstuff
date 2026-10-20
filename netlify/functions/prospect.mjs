@@ -1,7 +1,7 @@
 /* Prospect list generator — Netlify Function.
    GET /.netlify/functions/prospect?zip=75790&max=150&limit=150
    GET /.netlify/functions/prospect?city=Pasco,%20WA&max=150&limit=150
-   (with the signed-in user's Supabase token: Authorization: Bearer <token>)
+   (from the site itself: Authorization: Bearer <OWNER_TOKEN>, ../au/common.mjs)
    &team=<id>&agent=<id>: the list is for that agent — the places it holds
    are remembered for them (the last GIVEN_MAX). A new list for them:
    POST …&fresh=1 with { exclude: [{ n: name, a: address, p: phone }] }
@@ -18,10 +18,6 @@ import { resolve4, resolve6 } from "node:dns/promises";
 import { getStore } from "@netlify/blobs";
 import { isOwner } from "../au/common.mjs";
 
-/* the same public project URL + publishable key the app itself uses */
-const SB_URL = "https://xeevmevxjuawskugedds.supabase.co";
-const SB_KEY = "sb_publishable_hYOu-5EyUkMyJ64UNBTnwQ_4ehY5Roc";
-const COMPANY = /@wholesalepayments\.com$/i;
 
 const CATEGORIES = [
   "auto repair shop",
@@ -101,35 +97,6 @@ const json = (o, status = 200) =>
     status,
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
-
-/* who is calling: the Supabase user behind the bearer token, remembered for
-   a few minutes per token */
-const USERS = new Map();
-async function callerEmail(req) {
-  const m = /^Bearer\s+(\S{20,4096})$/i.exec(req.headers.get("authorization") || "");
-  if (!m) return { status: 401 };
-  const token = m[1];
-  const hit = USERS.get(token);
-  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return { email: hit.email, id: hit.id, confirmed: hit.confirmed };
-  let r;
-  try {
-    r = await fetch(SB_URL + "/auth/v1/user", {
-      headers: { apikey: SB_KEY, authorization: "Bearer " + token },
-      signal: AbortSignal.timeout(4000),
-    });
-  } catch (e) { return { status: 503 }; }
-  if (r.status === 401 || r.status === 403) return { status: 401 };
-  if (!r.ok) return { status: 503 };
-  let u = null;
-  try { u = await r.json(); } catch (e) {}
-  const email = String((u && u.email) || ""), id = String((u && u.id) || "");
-  if (!email) return { status: 401 };
-  /* a proven mailbox: Supabase stamps this once the confirmation link is opened */
-  const confirmed = !!(u.email_confirmed_at || u.confirmed_at);
-  if (USERS.size > 200) USERS.clear();
-  USERS.set(token, { at: Date.now(), email, id, confirmed });
-  return { email, id, confirmed };
-}
 
 /* every search bills ~50 Places requests: a generous per-person cap keeps a
    runaway script (or a borrowed sign-in) from running up the bill; repeats
@@ -234,14 +201,9 @@ export default async (req) => {
   if (Number.isNaN(max)) return json({ error: "bad_max", hint: "The review cap must be a whole number" }, 400);
   if (Number.isNaN(limit)) return json({ error: "bad_limit", hint: "The list size must be a whole number" }, 400);
 
-  /* (a one-person site: its owner, no sign-in — see ../au/common.mjs) */
-  const who = isOwner(req) ? { id: "owner", email: "owner" } : await callerEmail(req);
-  if (!isOwner(req)) {
-    if (who.status === 503) return json({ error: "auth_unavailable", hint: "Couldn’t confirm your sign-in — try again in a minute" }, 503);
-    if (!who.email) return json({ error: "auth", hint: "Your sign-in has expired — sign out and back in, then try again" }, 401);
-    if (!COMPANY.test(who.email)) return json({ error: "forbidden", hint: "This email address isn’t authorized" }, 403);
-    if (!who.confirmed) return json({ error: "unconfirmed", hint: "Confirm your email address first — open the link we sent to your inbox" }, 403);
-  }
+  /* (a one-person site: only the site itself — see ../au/common.mjs) */
+  if (!isOwner(req)) return json({ error: "auth", hint: "This site’s search only answers the site itself" }, 401);
+  const who = { id: "owner", email: "owner" };
 
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) return json({ error: "missing_key", hint: "Auto-generate needs the Google Places key set on the site" }, 500);
